@@ -162,7 +162,21 @@ class Character():
 
 		# Face the player in the direction they are moving
 		if movement.length_squared > 0.0001:
-			self.set_orientation_vector(movement)
+			x = movement.cross(Vector((0, 0, 1)))
+			x.normalize()
+
+			y = movement.normalized()
+
+			z = x.cross(y)
+			z.normalize()
+
+			ori = (
+					(x[0], y[0], z[0]),
+					(x[1], y[1], z[1]),
+					(x[2], y[2], z[2])
+				)
+
+			self._gameobj.localOrientation = ori
 
 	def jump(self, double=False):
 		if self.is_dead():
