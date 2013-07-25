@@ -134,13 +134,6 @@ class Character():
 		momentum = self._speed_h.copy()
 		momentum.normalize()
 
-		if self.is_attacking():
-			# Only set direction, not movement
-			if direction.length_squared > 0.0001:
-				v = direction
-				self.set_orientation_vector(Vector((v.x, v.y, 0)))
-			direction = Vector((0, 0))
-
 		if direction.length_squared != 0:
 
 			# Normalize direction
