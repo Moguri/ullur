@@ -34,6 +34,8 @@ def run():
 			movevec += Vector((0, -1))
 		elif key == events.DKEY:
 			movevec += Vector((1, 0))
+		elif key == events.SPACEKEY and status == logic.KX_INPUT_JUST_ACTIVATED:
+			logic.character.jump()
 
 	logic.character.move(movevec)
 
