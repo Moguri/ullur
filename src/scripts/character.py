@@ -179,7 +179,7 @@ class Character():
 			self._gameobj.localOrientation = ori
 
 	def jump(self, double=False):
-		if self.is_dead():
+		if self.is_dead:
 			return
 
 		if not self.airborne and self._phy_char.jumpCount == 0:
