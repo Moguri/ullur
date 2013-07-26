@@ -225,5 +225,4 @@ class UllurCharacter(Character):
 		else:
 			self.animate("right_attack")
 
-		print("Attack")
 		self._attack_time = time.time() + (16 / 30)
