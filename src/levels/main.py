@@ -4,7 +4,7 @@ import math
 
 
 from bge import logic, events
-from mathutils import Vector
+from mathutils import Vector, Euler
 
 
 def init():
@@ -26,7 +26,6 @@ def run():
 	logic.character.update()
 
 	cam = logic.getCurrentScene().active_camera
-	cam_mat = cam.worldOrientation
 
 	movevec = Vector((0, 0, 0))
 
@@ -55,6 +54,13 @@ def run():
 
 	logic.mouse.position = (0.5, 0.5)
 
-	movevec = cam_mat * movevec
-	logic.character.move(movevec.normalized().xy)
+	cam_vec = cam.getAxisVect((0, 0, -1))
+	cam_vec.z = 0
+	offset = cam_vec.angle(Vector((0, 1, 0)))
+	if cam_vec.x > 0:
+		offset *= -1
+	offset = Euler((0, 0, offset))
+	movevec.rotate(offset)
+
+	logic.character.move(movevec.xy)
 
