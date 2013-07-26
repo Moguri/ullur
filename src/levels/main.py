@@ -47,10 +47,19 @@ def run():
 		elif event == events.RIGHTMOUSE and status == logic.KX_INPUT_JUST_ACTIVATED:
 			logic.character.attack("RIGHT")
 
-	diffx = 0.5 - logic.mouse.position[0]
+	dx = 0.5 - logic.mouse.position[0]
+	dy = 0.5 - logic.mouse.position[1]
 
-	if math.fabs(diffx) > 0.01:
-		cam.parent.applyRotation((0, 0, diffx))
+	# X Movement
+	if math.fabs(dx) > 0.01:
+		cam.parent.applyRotation((0, 0, dx))
+
+	# Y Movement
+	cam_angle = cam.parent.localOrientation.to_euler('XYZ')
+	move_down_limit = dy > 0 and cam_angle.x < 0.5
+	move_up_limit = dy < 0 and cam_angle.x > -1.1
+	if math.fabs(dy) > 0.01 and (move_down_limit or move_up_limit):
+		cam.parent.applyRotation((dy/2, 0, 0), True)
 
 	logic.mouse.position = (0.5, 0.5)
 
