@@ -20,6 +20,7 @@ def main():
 	else:
 		config.add_section('system')
 		config.set('system', 'debug', 'false')
+		config.set('system', 'player_path', 'blenderplayer')
 
 		config.add_section('window')
 		config.set('window', 'fullscreen', 'false')
@@ -34,7 +35,7 @@ def main():
 		with open(CONFIG_NAME, 'w') as f:
 			config.write(f)
 
-	args = ['blenderplayer']
+	args = [config.get('system', 'player_path')]
 
 	args.append('-f' if config.getboolean('window', 'fullscreen') else '-w')
 	args.append(config.get('window', 'x_resolution'))
