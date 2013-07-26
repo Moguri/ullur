@@ -1,5 +1,6 @@
 import sys
 import os
+import math
 
 
 from bge import logic, events
@@ -13,6 +14,7 @@ def init():
 
 		from scripts.character import Character
 		logic.character = Character.spawn()
+		logic.mouse.position = (0.5, 0.5)
 
 
 def run():
@@ -40,5 +42,13 @@ def run():
 		elif key == events.SPACEKEY and status == logic.KX_INPUT_JUST_ACTIVATED:
 			logic.character.jump()
 
+	diffx = 0.5 - logic.mouse.position[0]
+
+	if math.fabs(diffx) > 0.01:
+		cam.parent.applyRotation((0, 0, diffx))
+
+	logic.mouse.position = (0.5, 0.5)
+
+	movevec = cam_mat * movevec
 	logic.character.move(movevec.normalized().xy)
 
