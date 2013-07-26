@@ -12,8 +12,8 @@ def init():
 		os.chdir(logic.expandPath("//"))
 		sys.path.append("..")
 
-		from scripts.character import Character
-		logic.character = Character.spawn()
+		from scripts.character import UllurCharacter
+		logic.character = UllurCharacter.spawn()
 		logic.mouse.position = (0.5, 0.5)
 
 
@@ -41,6 +41,12 @@ def run():
 			movevec += Vector((1, 0, 0))
 		elif key == events.SPACEKEY and status == logic.KX_INPUT_JUST_ACTIVATED:
 			logic.character.jump()
+
+	for event, status in logic.mouse.active_events.items():
+		if event == events.LEFTMOUSE and status == logic.KX_INPUT_JUST_ACTIVATED:
+			logic.character.attack("LEFT")
+		elif event == events.RIGHTMOUSE and status == logic.KX_INPUT_JUST_ACTIVATED:
+			logic.character.attack("RIGHT")
 
 	diffx = 0.5 - logic.mouse.position[0]
 

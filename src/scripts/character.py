@@ -98,6 +98,8 @@ class Character():
 
 		for layer, v in enumerate(self.ANIMATIONS[animation]):
 			anim, start, end = v
+			if anim == "*":
+				continue
 			ob = self._armature if self._armature else self._gameobj
 
 			ob.playAction(anim, start, end, play_mode=logic.KX_ACTION_MODE_LOOP, layer=layer, blendin=3, layer_weight=0.5)
@@ -195,3 +197,33 @@ class Character():
 		fps_scale = 60 / fps if fps != 0 else 60
 
 		self._phy_char.walkDirection = vec * fps_scale
+
+
+class UllurCharacter(Character):
+
+	ANIMATIONS = {
+				"move": [('RunBase', 1, 20), ('RunTop', 1, 20)],
+				"idle": [('IdleBase', 1, 220), ('IdleTop', 1, 300)],
+				"jump_start": [('JumpStart', 1, 5)],
+				"jump_loop": [('JumpLoop', 1, 30)],
+				"left_attack": [('*', 0, 0), ('SliceVertical', 1, 16)],
+				"right_attack": [('*', 0, 0), ('SliceHorizontal', 1, 16)],
+				}
+
+	def __init__(self, gameobj):
+		super().__init__(gameobj)
+
+		self._attack_time = time.time()
+
+	def update(self):
+		if self.hp < 0 or self._attack_time - time.time() < 0:
+			super().update()
+
+	def attack(self, mode):
+		if mode == "LEFT":
+			self.animate("left_attack")
+		else:
+			self.animate("right_attack")
+
+		print("Attack")
+		self._attack_time = time.time() + (16 / 30)
