@@ -7,6 +7,12 @@ from bge import logic, events
 from mathutils import Vector, Euler
 
 
+CAM_MAX_DIST = 9
+CAM_MIN_DIST = 7
+CAM_DOWN_LIMIT = 0.5
+CAM_UP_LIMIT = -1.1
+
+
 def init():
 	if ".." not in sys.path:
 		os.chdir(logic.expandPath("//"))
@@ -56,10 +62,17 @@ def run():
 
 	# Y Movement
 	cam_angle = cam.parent.localOrientation.to_euler('XYZ')
-	move_down_limit = dy > 0 and cam_angle.x < 0.5
-	move_up_limit = dy < 0 and cam_angle.x > -1.1
+	move_down_limit = dy > 0 and cam_angle.x < CAM_DOWN_LIMIT
+	move_up_limit = dy < 0 and cam_angle.x > CAM_UP_LIMIT
 	if math.fabs(dy) > 0.01 and (move_down_limit or move_up_limit):
 		cam.parent.applyRotation((dy/2, 0, 0), True)
+
+	# Zoom in camera based on y movement
+	if cam_angle.x > 0:
+		fac = cam_angle.x / CAM_DOWN_LIMIT
+		cam.localPosition.y = -((CAM_MAX_DIST - CAM_MIN_DIST) * (1 - fac) + CAM_MIN_DIST)
+	else:
+		cam.localPosition.y = -CAM_MAX_DIST
 
 	logic.mouse.position = (0.5, 0.5)
 
