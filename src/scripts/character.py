@@ -5,7 +5,7 @@ from bge import logic, constraints, types
 from mathutils import Vector, Matrix
 
 
-class Character():
+class Character(types.KX_GameObject):
 	MAX_HP = 10
 
 	MAX_SPEED = 0.10
@@ -26,6 +26,8 @@ class Character():
 				}
 
 	def __init__(self, obj):
+		types.KX_GameObject.__init__(obj)
+
 		self._speed_h = Vector.Fill(2)
 		self._flags = set()
 
@@ -33,19 +35,19 @@ class Character():
 
 		self.hp = self.MAX_HP
 
-		self._gameobj = obj
-
-		l = [i for i in obj.childrenRecursive if isinstance(i, types.BL_ArmatureObject)]
+		l = [i for i in self.childrenRecursive if isinstance(i, types.BL_ArmatureObject)]
 		if l:
 			self._armature = l[0]
 		else:
 			self._armature = None
 
 		# Enable double jump
-		self._phy_char = constraints.getCharacter(self._gameobj)
+		self._phy_char = constraints.getCharacter(self)
 		self._phy_char.maxJumps = 2
 
 		self.gravity = self.GRAVITY
+
+		self = self
 
 	@property
 	def is_dead(self):
@@ -89,7 +91,7 @@ class Character():
 
 	def rotate(self, rotation):
 		if not "DEAD" in self._flags:
-			self._gameobj.applyRotation(Vector((0, 0, rotation)))
+			self.applyRotation(Vector((0, 0, rotation)))
 
 	def animate(self, animation):
 		if animation not in self.ANIMATIONS:
@@ -100,7 +102,7 @@ class Character():
 			anim, start, end = v
 			if anim == "*":
 				continue
-			ob = self._armature if self._armature else self._gameobj
+			ob = self._armature if self._armature else self
 
 			ob.playAction(anim, start, end, play_mode=logic.KX_ACTION_MODE_LOOP, layer=layer, blendin=3, layer_weight=0.5)
 
@@ -108,7 +110,7 @@ class Character():
 		if self._armature:
 			self._armature.stopAction(layer)
 		else:
-			self._gameobj.stopAction(layer)
+			self.stopAction(layer)
 
 	def update(self):
 		if self.is_dead:
@@ -178,7 +180,7 @@ class Character():
 					(x[2], y[2], z[2])
 				)
 
-			self._gameobj.localOrientation = ori
+			self.localOrientation = ori
 
 	def jump(self, double=False):
 		if self.is_dead:
