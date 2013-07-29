@@ -201,6 +201,30 @@ class Character(types.KX_GameObject):
 		self._phy_char.walkDirection = vec * fps_scale
 
 
+class AttackSensor(types.KX_GameObject):
+	def __init__(self, gameobj, character):
+		types.KX_GameObject.__init__(gameobj)
+
+		self._character = character
+		self.collisionCallbacks.append(self.collision)
+
+		self.collisions = set()
+
+	def __new__(cls, gameobj, character):
+		return super().__new__(cls, gameobj)
+
+	def __del__(self):
+		self.collisionCallbacks.remove(self.collision)
+
+	def collision(self, other):
+		if other != self._character and isinstance(other, Character):
+			self.collisions.add(other)
+
+	def reset_collisions(self):
+		self.collisions = set()
+
+
+
 class UllurCharacter(Character):
 
 	ANIMATIONS = {
@@ -216,10 +240,22 @@ class UllurCharacter(Character):
 		super().__init__(gameobj)
 
 		self._attack_time = time.time()
+		self._attack_sensors = [AttackSensor(i, self) for i in self.childrenRecursive if i.name.startswith('AttackSensor')]
+		self._targets_hit = set()
 
 	def update(self):
 		if self.hp < 0 or self._attack_time - time.time() < 0:
 			super().update()
+
+			self._targets_hit = set()
+
+		elif self._attack_time - time.time() > 0:
+			# Still attacking
+			for i in self._attack_sensors:
+				for j in self._targets_hit - i.collisions:
+					j.hp -= 5
+				self._targets_hit |= i.collisions
+
 
 	def attack(self, mode):
 		if mode == "LEFT":
