@@ -224,6 +224,10 @@ class AttackSensor(types.KX_GameObject):
 		self.collisions = set()
 
 
+class Meatsack(Character):
+	MESH = "Meatsack"
+
+
 
 class UllurCharacter(Character):
 

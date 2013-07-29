@@ -19,8 +19,12 @@ def init():
 		sys.path.append("..")
 
 		try:
-			from scripts.character import UllurCharacter
+			from scripts.character import UllurCharacter, Meatsack
 			logic.character = UllurCharacter.spawn()
+
+			logic.meatsacks = []
+			for i in [i for i in logic.getCurrentScene().objects if i.name.startswith('MeatsackSpawn')]:
+				logic.meatsacks.append(Meatsack.spawn(i.worldPosition, i.worldOrientation))
 		except:
 			import traceback
 			traceback.print_exc()
@@ -93,4 +97,12 @@ def run():
 	movevec.rotate(offset)
 
 	logic.character.move(movevec.xy)
+
+
+	# Update meatsacks
+	for i in logic.meatsacks[:]:
+		i.update()
+		if i.is_dead:
+			logic.meatsacks.remove(i)
+			i.endObject()
 
