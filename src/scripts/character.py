@@ -208,8 +208,11 @@ class AttackSensor(types.KX_GameObject):
 		self._character = character
 		self.collisionCallbacks.append(self.collision)
 
-		self.collisions = set()
 		self.detect_collisions = False
+
+	@property
+	def collisions(self):
+		return self._character._attack_hits
 
 	def __new__(cls, gameobj, character):
 		return super().__new__(cls, gameobj)
@@ -224,9 +227,6 @@ class AttackSensor(types.KX_GameObject):
 		if other != self._character and isinstance(other, Character) and other not in self.collisions:
 			self.collisions.add(other)
 			other.hp -= 5
-
-	def reset_collisions(self):
-		self.collisions = set()
 
 
 class Meatsack(Character):
@@ -250,6 +250,7 @@ class UllurCharacter(Character):
 
 		self._attack_time = time.time()
 		self._attack_sensors = [AttackSensor(i, self) for i in self.childrenRecursive if i.name.startswith('AttackSensor')]
+		self._attack_hits = set()
 
 	def update(self):
 		if self.hp < 0 or self._attack_time - time.time() < 0:
@@ -265,8 +266,9 @@ class UllurCharacter(Character):
 		else:
 			self.animate("right_attack")
 
+		self._attack_hits.clear()
+
 		for i in self._attack_sensors:
 			i.detect_collisions = True
-			i.reset_collisions()
 
 		self._attack_time = time.time() + (16 / 30)
