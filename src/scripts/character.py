@@ -209,6 +209,7 @@ class AttackSensor(types.KX_GameObject):
 		self.collisionCallbacks.append(self.collision)
 
 		self.collisions = set()
+		self.detect_collisions = False
 
 	def __new__(cls, gameobj, character):
 		return super().__new__(cls, gameobj)
@@ -217,8 +218,12 @@ class AttackSensor(types.KX_GameObject):
 		self.collisionCallbacks.remove(self.collision)
 
 	def collision(self, other):
-		if other != self._character and isinstance(other, Character):
+		if not self.detect_collisions:
+			return
+
+		if other != self._character and isinstance(other, Character) and other not in self.collisions:
 			self.collisions.add(other)
+			other.hp -= 5
 
 	def reset_collisions(self):
 		self.collisions = set()
@@ -245,20 +250,13 @@ class UllurCharacter(Character):
 
 		self._attack_time = time.time()
 		self._attack_sensors = [AttackSensor(i, self) for i in self.childrenRecursive if i.name.startswith('AttackSensor')]
-		self._targets_hit = set()
 
 	def update(self):
 		if self.hp < 0 or self._attack_time - time.time() < 0:
-			super().update()
-
-			self._targets_hit = set()
-
-		elif self._attack_time - time.time() > 0:
-			# Still attacking
 			for i in self._attack_sensors:
-				for j in self._targets_hit - i.collisions:
-					j.hp -= 5
-				self._targets_hit |= i.collisions
+				i.detect_collisions = False
+
+			super().update()
 
 
 	def attack(self, mode):
@@ -266,5 +264,9 @@ class UllurCharacter(Character):
 			self.animate("left_attack")
 		else:
 			self.animate("right_attack")
+
+		for i in self._attack_sensors:
+			i.detect_collisions = True
+			i.reset_collisions()
 
 		self._attack_time = time.time() + (16 / 30)
