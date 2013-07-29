@@ -2,7 +2,7 @@ uniform sampler2D bgl_RenderedTexture;
 uniform sampler2D bgl_DepthTexture;
 uniform vec2 bgl_TextureCoordinateOffset[9];
 
-const float bias = 0.001;
+const float bias = 0.00025;
 const int thickness = 2;
 
 void main()
