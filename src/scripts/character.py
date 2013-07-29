@@ -208,6 +208,9 @@ class AttackSensor(types.KX_GameObject):
 		self._character = character
 		self.collisionCallbacks.append(self.collision)
 
+		if not hasattr(character, "_attack_hits"):
+			character._attack_hits = set()
+
 		self.detect_collisions = False
 
 	@property
@@ -219,6 +222,13 @@ class AttackSensor(types.KX_GameObject):
 
 	def __del__(self):
 		self.collisionCallbacks.remove(self.collision)
+
+	def start_attack(self):
+		self.detect_collisions = True
+		self.collisions.clear()
+
+	def end_attack(self):
+		self.detect_collisions = False
 
 	def collision(self, other):
 		if not self.detect_collisions:
@@ -250,12 +260,11 @@ class UllurCharacter(Character):
 
 		self._attack_time = time.time()
 		self._attack_sensors = [AttackSensor(i, self) for i in self.childrenRecursive if i.name.startswith('AttackSensor')]
-		self._attack_hits = set()
 
 	def update(self):
 		if self.hp < 0 or self._attack_time - time.time() < 0:
 			for i in self._attack_sensors:
-				i.detect_collisions = False
+				i.end_attack()
 
 			super().update()
 
@@ -266,9 +275,7 @@ class UllurCharacter(Character):
 		else:
 			self.animate("right_attack")
 
-		self._attack_hits.clear()
-
 		for i in self._attack_sensors:
-			i.detect_collisions = True
+			i.start_attack()
 
 		self._attack_time = time.time() + (16 / 30)
