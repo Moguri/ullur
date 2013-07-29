@@ -18,8 +18,13 @@ def init():
 		os.chdir(logic.expandPath("//"))
 		sys.path.append("..")
 
-		from scripts.character import UllurCharacter
-		logic.character = UllurCharacter.spawn()
+		try:
+			from scripts.character import UllurCharacter
+			logic.character = UllurCharacter.spawn()
+		except:
+			import traceback
+			traceback.print_exc()
+			logic.character = None
 		logic.mouse.position = (0.5, 0.5)
 
 
@@ -28,6 +33,9 @@ def run():
 		logic.character
 	except AttributeError:
 		init()
+
+	if not logic.character:
+		return
 
 	logic.character.update()
 
