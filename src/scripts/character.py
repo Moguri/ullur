@@ -240,7 +240,7 @@ class AttackSensor(types.KX_GameObject):
 
 
 class Meatsack(Character):
-	MESH = "Meatsack"
+	MESH = "Cosbad"
 
 
 
