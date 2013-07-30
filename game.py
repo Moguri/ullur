@@ -50,7 +50,7 @@ def main():
 	if config.getboolean('system', 'debug'):
 		args.append("-c")
 
-	args.append(os.getcwd() + "/src/levels/level.blend")
+	args.append(os.getcwd() + "/src/levels/test_grounds.blend")
 
 	# Keep PyDev from setting the PYTHONPATH
 	env = os.environ.copy()
