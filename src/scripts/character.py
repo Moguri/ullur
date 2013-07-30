@@ -65,6 +65,10 @@ class Character(types.KX_GameObject):
 	def airborne(self):
 		return not self._phy_char.onGround
 
+	@property
+	def armature(self):
+		return self._armature if self._armature else self
+
 	@classmethod
 	def spawn(cls, position=None, orientation=None):
 		name = cls.MESH
@@ -102,7 +106,7 @@ class Character(types.KX_GameObject):
 			anim, start, end = v
 			if anim == "*":
 				continue
-			ob = self._armature if self._armature else self
+			ob = self.armature
 
 			ob.playAction(anim, start, end, play_mode=logic.KX_ACTION_MODE_LOOP, layer=layer, blendin=3, layer_weight=0.5)
 
@@ -251,8 +255,8 @@ class UllurCharacter(Character):
 				"idle": [('IdleBase', 1, 220), ('IdleTop', 1, 300)],
 				"jump_start": [('JumpStart', 1, 5)],
 				"jump_loop": [('JumpLoop', 1, 30)],
-				"left_attack": [('*', 0, 0), ('SliceVertical', 1, 16)],
-				"right_attack": [('*', 0, 0), ('SliceHorizontal', 1, 16)],
+				"left_attack": [('Attack1', 1, 4)],
+				"right_attack": [('SliceHorizontal', 1, 16)],
 				}
 
 	def __init__(self, gameobj):
@@ -260,22 +264,37 @@ class UllurCharacter(Character):
 
 		self._attack_time = time.time()
 		self._attack_sensors = [AttackSensor(i, self) for i in self.childrenRecursive if i.name.startswith('AttackSensor')]
+		self.combo = 0
 
 	def update(self):
 		if self.hp < 0 or self._attack_time - time.time() < 0:
 			for i in self._attack_sensors:
 				i.end_attack()
 
+			if time.time() - self._attack_time > 0.5:
+				self.combo = 0
+
 			super().update()
 
 
 	def attack(self, mode):
+		if self._attack_time - time.time() > 0:
+			return
+
+		self.stop_animation(1)
+
 		if mode == "LEFT":
-			self.animate("left_attack")
+			self.combo = (self.combo + 1) % 2
+
+			anim = self.ANIMATIONS["left_attack"][0]
+			if self.combo == 1:
+				anim = ('Attack2', anim[1], anim[2])
+
 		else:
-			self.animate("right_attack")
+			anim = self.ANIMATIONS["right_attack"][0]
 
 		for i in self._attack_sensors:
 			i.start_attack()
 
-		self._attack_time = time.time() + (16 / 30)
+		self.armature.playAction(anim[0], anim[1], anim[2], blendin=2)
+		self._attack_time = time.time() + (anim[2] - anim[1]) / 30
