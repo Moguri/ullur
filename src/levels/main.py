@@ -7,6 +7,7 @@ from bge import logic, events
 from mathutils import Vector, Euler
 
 
+
 CAM_MAX_DIST = 9
 CAM_MIN_DIST = 7
 CAM_DOWN_LIMIT = 0.5
@@ -29,6 +30,23 @@ def init():
 			import traceback
 			traceback.print_exc()
 			logic.character = None
+
+		try:
+			from scripts.ai.manager import Manager
+			from scripts.ai.agent import AgentBGE
+			logic.ai_system = Manager()
+			if logic.character:
+				target = AgentBGE(logic.character)
+				for meatsack in logic.meatsacks:
+					agent = AgentBGE(meatsack)
+					agent.target = target
+					logic.ai_system._agents.append(agent)
+
+		except:
+			import traceback
+			traceback.print_exc()
+			logic.ai_system = None
+
 		logic.mouse.position = (0.5, 0.5)
 
 
@@ -99,6 +117,8 @@ def run():
 
 	logic.character.move(movevec.xy)
 
+	if logic.ai_system:
+		logic.ai_system.update()
 
 	# Update meatsacks
 	for i in logic.meatsacks[:]:
