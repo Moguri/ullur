@@ -28,11 +28,9 @@ class AgentBGE(Agent):
 
 	def apply_steering(self, dt):
 		self.linear = mathutils.Vector(self.linear)
-		self.linear.normalize()
-		self.linear *= self.max_acceleration
 
 		acceleration = self.linear * dt
-		friction = self.max_speed / self.max_acceleration
+		friction = self.max_acceleration * dt / self.max_speed
 		self.velocity += acceleration - friction*self.velocity
 
 		if self.angular > self.turn_speed:

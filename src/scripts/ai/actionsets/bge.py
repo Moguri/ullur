@@ -14,5 +14,7 @@ def seek(agent):
 		return output
 
 	output.linear = agent.target.position - agent.position
+	output.linear.normalize()
+	output.linear *= agent.max_acceleration
 
 	return output
