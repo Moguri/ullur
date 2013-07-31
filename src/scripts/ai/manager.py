@@ -9,9 +9,9 @@ class Manager:
 		for item in dir(bge_actions):
 			if not item.startswith("_"):
 				self._action_set[item] = getattr(bge_actions, item)
-				
-		for i, v in self._action_set.items():
-			print(i, '=', v)
+
+		# for i, v in self._action_set.items():
+			# print(i, '=', v)
 
 	def update(self, dt):
 		invalid_agents = []
@@ -22,7 +22,7 @@ class Manager:
 
 			agent.update_actions(self._action_set)
 			agent.update_steering(dt)
-			agent.apply_steering()
+			agent.apply_steering(dt)
 
 		for agent in invalid_agents:
 			self._agents.remove(agent)

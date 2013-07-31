@@ -33,7 +33,7 @@ def init():
 
 		try:
 			from scripts.ai.manager import Manager
-			from scripts.ai.agent import AgentBGE
+			from scripts.ai.agent_bge import AgentBGE
 			logic.ai_system = Manager()
 			if logic.character:
 				target = AgentBGE(logic.character)

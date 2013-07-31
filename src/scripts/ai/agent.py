@@ -1,16 +1,10 @@
-import mathutils
-
-
 class Agent:
 	def __init__(self, object=None):
 		self.object = object
 		self.target = None
-		self.max_acceleration = 0.5
-		self.max_speed = 0.1
-		self.turn_speed = 0.1
 
-		self.velocity = mathutils.Vector.Fill(3)
-		self.rotation = 0
+		self.linear = [0, 0, 0]
+		self.angular = 0
 
 		self.actions = []
 
@@ -22,55 +16,34 @@ class Agent:
 			self.actions.append(action_table[action])
 
 	def update_steering(self, dt):
-		linear = mathutils.Vector.Fill(3)
+		linear = [0, 0, 0]
 		angular = 0
-		count = 0
+		lcount = 0
+		acount = 0
 
 		for action in self.actions:
 			output = action(self)
 			if output:
 				if output.linear:
-					linear += output.linear
+					self.linear[0] += output.linear[0]
+					self.linear[1] += output.linear[1]
+					self.linear[2] += output.linear[2]
+					lcount += 1
 				if output.angular:
-					angular += output.angular
-					count += 1
+					self.angular += output.angular
+					acount += 1
 
-		linear.normalize()
-		linear *= self.max_acceleration
+		if lcount:
+			self.linear[0] /= lcount
+			self.linear[1] /= lcount
+			self.linear[2] /= lcount
 
-		acceleration = linear * dt
-		friction = self.max_speed / self.max_acceleration
-		self.velocity += acceleration - friction*self.velocity
+		if acount:
+			self.angular /= acount
 
-		if count:
-			angular /= count
-			if angular > self.turn_speed:
-				angular = self.turn_speed
-
-	def apply_steering(self):
+	def apply_steering(self, dt):
 		pass
 
 	@property
 	def valid(self):
 		return True
-
-
-class AgentBGE(Agent):
-	def __init__(self, object=None):
-		Agent.__init__(self, object)
-
-	@property
-	def position(self):
-		return self.object.worldPosition
-
-	@property
-	def orientation(self):
-		return self.object.worldOrientation.to_euler('XYZ')[2]
-
-	@property
-	def valid(self):
-		return not self.object.invalid
-
-	def apply_steering(self):
-		self.object.applyMovement(self.velocity)
-		self.object.applyRotation((0, 0, self.rotation))
