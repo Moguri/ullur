@@ -16,8 +16,8 @@ class Agent:
 			self.actions.append(action_table[action])
 
 	def update_steering(self, dt):
-		linear = [0, 0, 0]
-		angular = 0
+		self.linear = [0, 0, 0]
+		self.angular = 0
 		lcount = 0
 		acount = 0
 
@@ -33,12 +33,12 @@ class Agent:
 					self.angular += output.angular
 					acount += 1
 
-		if lcount:
+		if lcount > 1:
 			self.linear[0] /= lcount
 			self.linear[1] /= lcount
 			self.linear[2] /= lcount
 
-		if acount:
+		if acount > 1:
 			self.angular /= acount
 
 	def apply_steering(self, dt):
