@@ -2,8 +2,8 @@ import mathutils
 
 class Steering:
 	def __init__(self):
-		self.velocity = mathutils.Vector.Fill(3)
-		self.rotation = 0
+		self.linear = mathutils.Vector.Fill(3)
+		self.angular = 0
 
 
 def seek(agent):
@@ -12,7 +12,7 @@ def seek(agent):
 	if not agent.target:
 		return output
 
-	output.velocity = agent.target.position - agent.position
+	output.linear = agent.target.position - agent.position
 	
 	return output
 	
@@ -21,33 +21,43 @@ class Agent:
 	def __init__(self, object=None):
 		self.object = object
 		self.target = None
-		self.move_speed = 0.1
+		self.max_acceleration = 0.5
+		self.max_speed = 0.1
 		self.turn_speed = 0.1
-		self.steering = Steering()
+		
+		self.velocity = mathutils.Vector.Fill(3)
+		self.rotation = 0
 		
 		self.actions = []
 		
 	def update_actions(self):
 		self.actions = [seek]
 		
-	def update_steering(self):
-		self.steering.velocity = mathutils.Vector.Fill(3)
-		self.steering.rotation = 0
+	def update_steering(self, dt):
+		linear = mathutils.Vector.Fill(3)
+		angular = 0
 		count = 0
 		
 		for action in self.actions:
 			output = action(self)
 			if output:
-				self.steering.velocity += output.velocity
-				self.steering.rotation += output.rotation
+				if output.linear:
+					linear += output.linear
+				if output.angular:
+					angular += output.angular
+					count += 1
 				
-		self.steering.velocity.normalize()
-		self.steering.velocity *= self.move_speed
+		linear.normalize()
+		linear *= self.max_acceleration
+		
+		acceleration = linear * dt
+		friction = self.max_speed / self.max_acceleration
+		self.velocity += acceleration - friction*self.velocity
 		
 		if count:
-			self.steering.rotation /= count
-			if self.steering.rotation > self.turn_speed:
-				self.steering.rotation = self.turn_speed
+			angular /= count
+			if angular > self.turn_speed:
+				angular = self.turn_speed
 			
 	def apply_steering(self):
 		pass
@@ -73,5 +83,5 @@ class AgentBGE(Agent):
 		return not self.object.invalid
 		
 	def apply_steering(self):
-		self.object.applyMovement(self.steering.velocity)
-		self.object.applyRotation((0, 0, self.steering.rotation))
+		self.object.applyMovement(self.velocity)
+		self.object.applyRotation((0, 0, self.rotation))

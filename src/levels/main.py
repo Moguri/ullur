@@ -117,8 +117,9 @@ def run():
 
 	logic.character.move(movevec.xy)
 
+	dt = 1 / logic.getAverageFrameRate()
 	if logic.ai_system:
-		logic.ai_system.update()
+		logic.ai_system.update(dt)
 
 	# Update meatsacks
 	for i in logic.meatsacks[:]:
