@@ -41,6 +41,9 @@ class Character(types.KX_GameObject):
 		else:
 			self._armature = None
 
+		# Don't play animations if this is true
+		self.animation_lock = False
+
 		# Enable double jump
 		self._phy_char = constraints.getCharacter(self)
 		self._phy_char.maxJumps = 2
@@ -98,6 +101,9 @@ class Character(types.KX_GameObject):
 			self.applyRotation(Vector((0, 0, rotation)))
 
 	def animate(self, animation):
+		if self.animation_lock:
+			return
+
 		if animation not in self.ANIMATIONS:
 			print("WARNING: %s does not have animation %s" % (self.__class__.__name__, animation))
 			return
@@ -242,6 +248,55 @@ class AttackSensor(types.KX_GameObject):
 			self.collisions.add(other)
 			other.hp -= 5
 
+class MeleeAttackManager:
+	def __init__(self, obj, attack_sensors, attacks):
+		obj._attack_time = time.time()
+		self._attack_sensors = attack_sensors
+		self._obj = obj
+		self._attacking = False
+		self.combo = 0
+
+		self.attacks = attacks
+		self.max_combo = len(attacks)
+
+	@property
+	def _attack_time(self):
+		return self._obj._attack_time
+
+	@_attack_time.setter
+	def _attack_time(self, value):
+		self._obj._attack_time = value
+
+	def update(self):
+		if self._attack_time - time.time() < 0:
+			self.stop_attacks()
+
+		if time.time() - self._attack_time > 0.5:
+			self.combo = 0
+
+	def attack(self):
+		if self._attack_time - time.time() > 0:
+			return
+
+
+		anim, start, end = self.attacks[self.combo]
+
+		for i in self._attack_sensors:
+			i.start_attack()
+
+		self._obj.animation_lock = self._attacking = True
+		self._obj.armature.playAction(anim, start, end, blendin=2)
+		self._attack_time = time.time() + (end - start) / 30
+
+		self.combo = (self.combo + 1) % self.max_combo
+
+	def stop_attacks(self):
+		if self._attacking:
+			for i in self._attack_sensors:
+				i.end_attack()
+
+			self._attacking = self._obj.animation_lock = False
+
 
 class Meatsack(Character):
 	MESH = "Cosbad"
@@ -259,42 +314,36 @@ class UllurCharacter(Character):
 				"right_attack": [('SliceHorizontal', 1, 16)],
 				}
 
+	LEFT_MELEE_ATTACKS = [
+			('Attack1', 1, 4),
+			('Attack2', 1, 4),
+		]
+
+	RIGHT_MELEE_ATTACKS = [
+			('SliceHorizontal', 1, 16),
+		]
+
 	def __init__(self, gameobj):
 		super().__init__(gameobj)
-
-		self._attack_time = time.time()
-		self._attack_sensors = [AttackSensor(i, self) for i in self.childrenRecursive if i.name.startswith('AttackSensor')]
-		self.combo = 0
+		attack_sensors = [AttackSensor(i, self) for i in self.childrenRecursive if i.name.startswith('AttackSensor')]
+		self.left_attack_manager = MeleeAttackManager(self, attack_sensors, self.LEFT_MELEE_ATTACKS)
+		self.right_attack_manager = MeleeAttackManager(self, attack_sensors, self.RIGHT_MELEE_ATTACKS)
 
 	def update(self):
-		if self.hp < 0 or self._attack_time - time.time() < 0:
-			for i in self._attack_sensors:
-				i.end_attack()
-
-			if time.time() - self._attack_time > 0.5:
-				self.combo = 0
-
+		if self.hp > 0:
+			self.left_attack_manager.update()
+			self.right_attack_manager.update()
 			super().update()
+		else:
+			self.left_attack_manager.stop_attacks()
+			self.right_attack_manager.stope_attacks()
 
 
 	def attack(self, mode):
-		if self._attack_time - time.time() > 0:
-			return
 
 		self.stop_animation(1)
 
 		if mode == "LEFT":
-			self.combo = (self.combo + 1) % 2
-
-			anim = self.ANIMATIONS["left_attack"][0]
-			if self.combo == 1:
-				anim = ('Attack2', anim[1], anim[2])
-
+			self.left_attack_manager.attack()
 		else:
-			anim = self.ANIMATIONS["right_attack"][0]
-
-		for i in self._attack_sensors:
-			i.start_attack()
-
-		self.armature.playAction(anim[0], anim[1], anim[2], blendin=2)
-		self._attack_time = time.time() + (anim[2] - anim[1]) / 30
+			self.right_attack_manager.attack()
