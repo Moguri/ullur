@@ -5,8 +5,6 @@ from bge import types
 
 class AttackSensor(types.KX_GameObject):
 	def __init__(self, gameobj, character):
-		types.KX_GameObject.__init__(gameobj)
-
 		self._character = character
 		self.collisionCallbacks.append(self.collision)
 
@@ -20,7 +18,7 @@ class AttackSensor(types.KX_GameObject):
 	def collisions(self):
 		return self._character._attack_hits
 
-	def __new__(cls, gameobj, character):
+	def __new__(cls, gameobj, *args):
 		return super().__new__(cls, gameobj)
 
 	def __del__(self):
