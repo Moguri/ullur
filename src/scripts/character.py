@@ -23,6 +23,7 @@ class Character(types.KX_GameObject):
 				"idle": [('IdleBase', 1, 220), ('IdleTop', 1, 300)],
 				"jump_start": [('JumpStart', 1, 5)],
 				"jump_loop": [('JumpLoop', 1, 30)],
+				"dead": [('Dance', 1, 71)],
 				}
 
 	def __init__(self, obj):
@@ -124,6 +125,8 @@ class Character(types.KX_GameObject):
 
 	def update(self):
 		if self.is_dead:
+			self._apply_movement(Vector((0, 0, 0)))
+			self.animate('dead')
 			return
 
 		if self.hp <= 0:
@@ -321,14 +324,6 @@ class Meatsack(Character):
 
 
 class UllurCharacter(Character):
-
-	ANIMATIONS = {
-				"move": [('RunBase', 1, 20), ('RunTop', 1, 20)],
-				"idle": [('IdleBase', 1, 220), ('IdleTop', 1, 300)],
-				"jump_start": [('JumpStart', 1, 5)],
-				"jump_loop": [('JumpLoop', 1, 30)],
-				}
-
 	LEFT_MELEE_ATTACKS = [
 			('Attack1', 1, 4),
 			('Attack2', 1, 4),
