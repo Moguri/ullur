@@ -336,7 +336,7 @@ class UllurCharacter(Character):
 			super().update()
 		else:
 			self.left_attack_manager.stop_attacks()
-			self.right_attack_manager.stope_attacks()
+			self.right_attack_manager.stop_attacks()
 
 
 	def attack(self, mode):
