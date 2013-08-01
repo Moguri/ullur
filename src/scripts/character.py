@@ -301,6 +301,26 @@ class MeleeAttackManager:
 class Meatsack(Character):
 	MESH = "Cosbad"
 
+	MELEE_ATTACK = [
+			('SliceVertical', 1, 16),
+		]
+
+	def __init__(self, gameobj):
+		super().__init__(gameobj)
+
+		attack_sensors = [AttackSensor(i, self) for i in self.childrenRecursive if i.name.startswith('AttackSensor')]
+		self.attack_manager = MeleeAttackManager(self, attack_sensors, self.MELEE_ATTACK)
+
+	def update(self):
+		if self.hp > 0:
+			self.attack_manager.update()
+			super().update()
+		else:
+			self.attack_manager.stop_attacks()
+
+	def attack(self):
+		self.attack_manager.attack()
+
 
 
 class UllurCharacter(Character):
