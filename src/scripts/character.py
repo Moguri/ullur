@@ -225,6 +225,7 @@ class AttackSensor(types.KX_GameObject):
 			character._attack_hits = set()
 
 		self.detect_collisions = False
+		self._damage = 0
 
 	@property
 	def collisions(self):
@@ -236,7 +237,8 @@ class AttackSensor(types.KX_GameObject):
 	def __del__(self):
 		self.collisionCallbacks.remove(self.collision)
 
-	def start_attack(self):
+	def start_attack(self, damage):
+		self._damage = damage
 		self.detect_collisions = True
 		self.collisions.clear()
 
@@ -249,7 +251,7 @@ class AttackSensor(types.KX_GameObject):
 
 		if other != self._character and isinstance(other, Character) and other not in self.collisions:
 			self.collisions.add(other)
-			other.hp -= 5
+			other.hp -= self._damage
 
 class MeleeAttackManager:
 	def __init__(self, obj, attack_sensors, attacks):
@@ -277,7 +279,7 @@ class MeleeAttackManager:
 		if time.time() - self._attack_time > 0.5:
 			self.combo = 0
 
-	def attack(self):
+	def attack(self, damage):
 		if self._attack_time - time.time() > 0 or self._obj.is_dead:
 			return
 
@@ -285,7 +287,7 @@ class MeleeAttackManager:
 		anim, start, end = self.attacks[self.combo]
 
 		for i in self._attack_sensors:
-			i.start_attack()
+			i.start_attack(damage)
 
 		self._obj.animation_lock = self._attacking = True
 		self._obj.armature.playAction(anim, start, end, blendin=2)
@@ -319,7 +321,7 @@ class Meatsack(Character):
 		super().update()
 
 	def attack(self):
-		self.attack_manager.attack()
+		self.attack_manager.attack(5)
 
 
 
@@ -349,6 +351,6 @@ class UllurCharacter(Character):
 		self.stop_animation(1)
 
 		if mode == "LEFT":
-			self.left_attack_manager.attack()
+			self.left_attack_manager.attack(5)
 		else:
-			self.right_attack_manager.attack()
+			self.right_attack_manager.attack(5)
