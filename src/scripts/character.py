@@ -268,14 +268,14 @@ class MeleeAttackManager:
 		self._obj._attack_time = value
 
 	def update(self):
-		if self._attack_time - time.time() < 0:
+		if self._attack_time - time.time() < 0 or self._obj.is_dead:
 			self.stop_attacks()
 
 		if time.time() - self._attack_time > 0.5:
 			self.combo = 0
 
 	def attack(self):
-		if self._attack_time - time.time() > 0:
+		if self._attack_time - time.time() > 0 or self._obj.is_dead:
 			return
 
 
@@ -312,11 +312,8 @@ class Meatsack(Character):
 		self.attack_manager = MeleeAttackManager(self, attack_sensors, self.MELEE_ATTACK)
 
 	def update(self):
-		if self.hp > 0:
-			self.attack_manager.update()
-			super().update()
-		else:
-			self.attack_manager.stop_attacks()
+		self.attack_manager.update()
+		super().update()
 
 	def attack(self):
 		self.attack_manager.attack()
@@ -348,14 +345,9 @@ class UllurCharacter(Character):
 		self.right_attack_manager = MeleeAttackManager(self, attack_sensors, self.RIGHT_MELEE_ATTACKS)
 
 	def update(self):
-		if self.hp > 0:
-			self.left_attack_manager.update()
-			self.right_attack_manager.update()
-			super().update()
-		else:
-			self.left_attack_manager.stop_attacks()
-			self.right_attack_manager.stop_attacks()
-
+		self.left_attack_manager.update()
+		self.right_attack_manager.update()
+		super().update()
 
 	def attack(self, mode):
 
