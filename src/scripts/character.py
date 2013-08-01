@@ -310,8 +310,6 @@ class UllurCharacter(Character):
 				"idle": [('IdleBase', 1, 220), ('IdleTop', 1, 300)],
 				"jump_start": [('JumpStart', 1, 5)],
 				"jump_loop": [('JumpLoop', 1, 30)],
-				"left_attack": [('Attack1', 1, 4)],
-				"right_attack": [('SliceHorizontal', 1, 16)],
 				}
 
 	LEFT_MELEE_ATTACKS = [
