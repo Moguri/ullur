@@ -227,14 +227,14 @@ class Meatsack(Character):
 		super().__init__(gameobj)
 
 		attack_sensors = [AttackSensor(i, self) for i in self.childrenRecursive if i.name.startswith('AttackSensor')]
-		self.attack_manager = MeleeAttackManager(self, attack_sensors, self.MELEE_ATTACK)
+		self.attack_manager = MeleeAttackManager(self, attack_sensors, self.MELEE_ATTACK, 5)
 
 	def update(self):
 		self.attack_manager.update()
 		super().update()
 
 	def attack(self):
-		self.attack_manager.attack(5)
+		self.attack_manager.attack()
 
 
 
@@ -251,7 +251,7 @@ class UllurCharacter(Character):
 	def __init__(self, gameobj):
 		super().__init__(gameobj)
 		attack_sensors = [AttackSensor(i, self) for i in self.childrenRecursive if i.name.startswith('AttackSensor')]
-		self.left_attack_manager = MeleeAttackManager(self, attack_sensors, self.LEFT_MELEE_ATTACKS)
+		self.left_attack_manager = MeleeAttackManager(self, attack_sensors, self.LEFT_MELEE_ATTACKS, 5)
 		#self.right_attack_manager = MeleeAttackManager(self, attack_sensors, self.RIGHT_MELEE_ATTACKS)
 		self.right_attack_manager = RangeAttackManager(self, "Projectile", 1, 5, 10, 0.5)
 
@@ -264,6 +264,6 @@ class UllurCharacter(Character):
 
 		if mode == "LEFT":
 			self.stop_animation(1)
-			self.left_attack_manager.attack(5)
+			self.left_attack_manager.attack()
 		else:
 			self.right_attack_manager.attack()

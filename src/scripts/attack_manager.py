@@ -43,12 +43,13 @@ class AttackSensor(types.KX_GameObject):
 
 
 class MeleeAttackManager:
-	def __init__(self, obj, attack_sensors, attacks):
+	def __init__(self, obj, attack_sensors, attacks, damage):
 		obj._attack_time = time.time()
 		self._attack_sensors = attack_sensors
 		self._obj = obj
 		self._attacking = False
 		self.combo = 0
+		self.damage = damage
 
 		self.attacks = attacks
 		self.max_combo = len(attacks)
@@ -68,7 +69,7 @@ class MeleeAttackManager:
 		if time.time() - self._attack_time > 0.5:
 			self.combo = 0
 
-	def attack(self, damage):
+	def attack(self):
 		if self._attack_time - time.time() > 0 or self._obj.is_dead:
 			return
 
@@ -76,7 +77,7 @@ class MeleeAttackManager:
 		anim, start, end = self.attacks[self.combo]
 
 		for i in self._attack_sensors:
-			i.start_attack(damage)
+			i.start_attack(self.damage)
 
 		self._obj.animation_lock = self._attacking = True
 		self._obj.armature.playAction(anim, start, end, blendin=2)
