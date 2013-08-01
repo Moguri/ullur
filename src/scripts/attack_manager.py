@@ -1,7 +1,8 @@
 import time
 
 
-from bge import types
+from bge import types, logic
+from mathutils import Vector
 
 class AttackSensor(types.KX_GameObject):
 	def __init__(self, gameobj, character):
@@ -89,3 +90,98 @@ class MeleeAttackManager:
 				i.end_attack()
 
 			self._attacking = self._obj.animation_lock = False
+
+
+
+class ProjectileSensor(types.KX_GameObject):
+
+	def __init__(self, start_position, projectile, direction, speed, damage, character):
+		self.start_position = self.worldPosition.copy()
+		self.direction = direction.normalized()
+		self.speed = speed
+		self.damage = damage
+		self._character = character
+
+		self.collisionCallbacks.append(self.collision)
+
+		self.collisions = set()
+
+	def __new__(cls, start_position, projectile, direction, *args):
+		adder = logic.getCurrentController().owner
+		scene = logic.getCurrentScene()
+
+		obj = scene.addObject(projectile, adder)
+
+		obj.worldPosition = start_position
+
+		x = direction.cross(Vector((0, 0, 1)))
+		x.normalize()
+
+		y = direction.normalized()
+
+		z = x.cross(y)
+		z.normalize()
+
+		ori = (
+				(x[0], y[0], z[0]),
+				(x[1], y[1], z[1]),
+				(x[2], y[2], z[2])
+			)
+
+		obj.worldOrientation = ori
+		return super().__new__(cls, obj)
+
+	def __del__(self):
+		self.collisionCallbacks.remove(self.collision)
+
+	def update(self):
+		# Move along the given direction vector with the given speed
+		vec = self.direction * self.speed
+
+		# Scale the speed so FPS changes don't mess with movement
+		fps = logic.getAverageFrameRate()
+		fps_scale = 60 / fps if fps != 0 else 60
+
+		self.worldPosition += vec * fps_scale
+
+	def collision(self, other):
+		if other != self._character and hasattr(other, "hp") and other not in self.collisions:
+			other.hp -= self.damage
+			self.collisions.add(other)
+
+
+class RangeAttackManager:
+	def __init__(self, obj, projectile, speed, distance, damage, cooldown):
+		self._obj = obj
+		self.speed = speed
+		self.projectile = projectile
+		self.distance = distance ** 2
+		self.damage = damage
+		self.cooldown = cooldown
+
+		self.projectiles = []
+		self._cooldown_timer = time.time()
+
+	def update(self):
+		if self._obj.is_dead and self.projectiles:
+			# Just kill any airborne projectiles
+			for i in self.projectiles:
+				i.endObject()
+		else:
+			for i in self.projectiles[:]:
+				i.update()
+				if (i.worldPosition - i.start_position).length_squared > self.distance:
+					self.projectiles.remove(i)
+					i.endObject()
+
+
+	def attack(self):
+		if self._cooldown_timer > time.time() or self._obj.is_dead:
+			return
+
+		direction = self._obj.getAxisVect((0, 1, 0))
+		start_position = self._obj.worldPosition
+
+		self.projectiles.append(ProjectileSensor(start_position, self.projectile, direction, self.speed, self.damage, self._obj))
+
+		self._cooldown_timer = time.time() + self.cooldown
