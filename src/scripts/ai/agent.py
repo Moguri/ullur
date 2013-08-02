@@ -48,7 +48,9 @@ class Agent:
 
 
 	def update_actions(self, action_table):
-		actions = ['seek']
+		actions = []
+		if self._decstrat:
+			actions = self._decstrat()
 
 		self.actions = []
 		for action in actions:
