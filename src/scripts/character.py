@@ -4,7 +4,7 @@ from bge import logic, constraints, types
 from mathutils import Vector, Matrix
 
 
-from .attack_manager import AttackSensor, MeleeAttackManager, RangeAttackManager
+from .attack_manager import AttackSensor, MeleeAttackManager, MouseRangeAttackManager
 
 
 class Character(types.KX_GameObject):
@@ -253,7 +253,7 @@ class UllurCharacter(Character):
 		attack_sensors = [AttackSensor(i, self) for i in self.childrenRecursive if i.name.startswith('AttackSensor')]
 		self.left_attack_manager = MeleeAttackManager(self, attack_sensors, self.LEFT_MELEE_ATTACKS, 5)
 		#self.right_attack_manager = MeleeAttackManager(self, attack_sensors, self.RIGHT_MELEE_ATTACKS)
-		self.right_attack_manager = RangeAttackManager(self, "Projectile", 1, 5, 10, 0.5)
+		self.right_attack_manager = MouseRangeAttackManager(self, "Projectile", 1, 100, 10, 0.5)
 
 	def update(self):
 		self.left_attack_manager.update()
