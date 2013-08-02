@@ -1,3 +1,15 @@
+from .decision_strategies.state_machine import StateMachine
+
+
+
+STRATEGIES = {
+	"STATE_MACHINE" : StateMachine
+	}
+
+
+STRATEGIES_INV = {v : k for k, v in STRATEGIES.items()}
+
+
 class Agent:
 	def __init__(self, object=None):
 		self.object = object
@@ -7,6 +19,22 @@ class Agent:
 		self.angular = 0
 
 		self.actions = []
+		
+		self._decstrat = None
+		self.decision_strategy = "STATE_MACHINE"
+		
+	@property
+	def decision_strategy(self):
+		return STRATEGIES_INV[type(self._decstrat)]
+		
+	@decision_strategy.setter
+	def decision_strategy(self, value):
+		if value not in STRATEGIES:
+			raise ValueError(value, "is not a valid decision strategy.", \
+				"Valid strategies are: %s" % str(STRATEGIES.keys()))
+				
+		self._decstrat = STRATEGIES[value]()
+			
 
 	def update_actions(self, action_table):
 		actions = ['seek']
