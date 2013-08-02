@@ -11,7 +11,7 @@ STRATEGIES_INV = {v : k for k, v in STRATEGIES.items()}
 
 
 class Agent:
-	def __init__(self, object=None):
+	def __init__(self, object=None, definition=None):
 		self.object = object
 		self.target = None
 
@@ -19,26 +19,37 @@ class Agent:
 		self.angular = 0
 
 		self.actions = []
-		
+
+
 		self._decstrat = None
 		self.decision_strategy = "STATE_MACHINE"
-		
+
+		if definition:
+			self.load_definition(definition)
+
 	@property
 	def decision_strategy(self):
 		return STRATEGIES_INV[type(self._decstrat)]
-		
+
 	@decision_strategy.setter
 	def decision_strategy(self, value):
 		if value not in STRATEGIES:
 			raise ValueError(value, "is not a valid decision strategy.", \
 				"Valid strategies are: %s" % str(STRATEGIES.keys()))
-				
+
 		self._decstrat = STRATEGIES[value]()
-			
+
+	def load_definition(self, data):
+		if self._decstrat:
+			self._decstrat.load(data)
+			return
+
+		raise AttributeError("Agent has no decision strategy set")
+
 
 	def update_actions(self, action_table):
 		actions = ['seek']
-		
+
 		self.actions = []
 		for action in actions:
 			self.actions.append(action_table[action])
