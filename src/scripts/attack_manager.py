@@ -176,13 +176,42 @@ class RangeAttackManager:
 					i.endObject()
 
 
-	def attack(self):
+	def attack(self, start_position, direction):
 		if self._cooldown_timer > time.time() or self._obj.is_dead:
 			return
-
-		direction = self._obj.getAxisVect((0, 1, 0))
-		start_position = self._obj.worldPosition
 
 		self.projectiles.append(ProjectileSensor(start_position, self.projectile, direction, self.speed, self.damage, self._obj))
 
 		self._cooldown_timer = time.time() + self.cooldown
+
+
+class MouseRangeAttackManager(RangeAttackManager):
+	def __init__(self, obj, projectile, speed, distance, damage, cooldown):
+		super().__init__(obj, projectile, speed, distance, damage, cooldown)
+
+		# DEBUGGING
+		#adder = logic.getCurrentController().owner
+		#scene = logic.getCurrentScene()
+
+		#obj = scene.addObject(projectile, adder)
+		#self._aim_ob = obj
+
+	def attack(self):
+		# Get start position
+		start_position = self._obj.worldPosition
+
+		# Get aim direction
+		cam = logic.getCurrentScene().active_camera
+
+		vec = cam.getScreenVect(0.5, 0.5) + cam.worldPosition
+
+		ob, point, norm = cam.rayCast(vec, None, -1000)
+
+		# DEBUGGING
+		#if point:
+			#self._aim_ob.worldPosition = point
+
+		# Calculate projectile direction
+		aim = point - start_position if point else cam.getAxisVect((0, 0, -1))
+
+		super().attack(start_position, aim)
