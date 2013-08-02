@@ -40,6 +40,7 @@ def init():
 				for meatsack in logic.meatsacks:
 					agent = AgentBGE(meatsack)
 					agent.target = target
+					agent.load_definition("../scripts/ai/definitions/state_test.json")
 					logic.ai_system._agents.append(agent)
 
 		except:

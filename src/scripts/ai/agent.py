@@ -1,5 +1,8 @@
-from .decision_strategies.state_machine import StateMachine
+import os
+import json
 
+
+from .decision_strategies.state_machine import StateMachine
 
 
 STRATEGIES = {
@@ -40,12 +43,16 @@ class Agent:
 		self._decstrat = STRATEGIES[value]()
 
 	def load_definition(self, data):
-		if self._decstrat:
-			self._decstrat.load(data)
-			return
+		if not self._decstrat:
+			raise AttributeError("Agent has no decision strategy set")
 
-		raise AttributeError("Agent has no decision strategy set")
+		if os.access(data, os.F_OK):
+			with open(data, 'r') as f:
+					data = json.load(f)
+		else:
+			data = json.loads(data)
 
+		self._decstrat.load(data)
 
 	def update_actions(self, action_table):
 		actions = []
