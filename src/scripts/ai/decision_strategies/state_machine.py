@@ -1,3 +1,6 @@
+from .conditions import get_condition
+
+
 class State:
 	__slots__ = ["actions", "entry_actions", "exit_actions", "transitions"]
 	
@@ -17,9 +20,10 @@ class Transition:
 
 
 class StateMachine:
-	def __init__(self):
+	def __init__(self, agent):
 		self.states = {}
 		self.current_state = None
+		self.agent = agent
 
 	def load(self, data):
 		# Load states
@@ -30,17 +34,33 @@ class StateMachine:
 
 			transitions = []
 			for transition in state["transitions"]:
-				condition = transition[0]
+				condition = get_condition(transition[0])
 				target_state = transition[1]
 				transitions.append(Transition(condition, target_state))
 
 			self.states[state["name"]] = State(actions, entry_actions,\
 				exit_actions, transitions)
 
+			if not self.current_state:
+				self.current_state = self.states[state["name"]]
+
 		# Link transitions
 		for state in self.states.values():
 			for transition in state.transitions:
 				transition.state = self.states[transition.state]
 
-	def __call__(self):	
-		return ["seek"]
+	def __call__(self):
+		actions = []
+
+		for transition in self.current_state.transitions:
+			if transition.condition.test(self.agent):
+				target_state = transition.state
+
+				actions += self.current_state.exit_actions
+				actions += target_state.entry_actions
+
+				self.current_state = target_state
+
+				return actions
+		else:
+			return self.current_state.actions

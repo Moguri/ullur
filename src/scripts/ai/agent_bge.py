@@ -5,6 +5,10 @@ from .agent import Agent
 
 
 class AgentBGE(Agent):
+	'''
+	A prebuilt Agent class for use with the Blender Game Engine.
+	The forward vector is assumed to be +Y
+	'''
 	def __init__(self, object=None):
 		Agent.__init__(self, object)
 
@@ -13,6 +17,10 @@ class AgentBGE(Agent):
 		self.turn_speed = 0.1
 		
 		self.velocity = mathutils.Vector.Fill(3)
+		
+	@property
+	def target_range(self):
+		return (self.target.position - self.position).length
 
 	@property
 	def position(self):

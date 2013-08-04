@@ -40,7 +40,7 @@ class Agent:
 			raise ValueError(value, "is not a valid decision strategy.", \
 				"Valid strategies are: %s" % str(STRATEGIES.keys()))
 
-		self._decstrat = STRATEGIES[value]()
+		self._decstrat = STRATEGIES[value](self)
 
 	def load_definition(self, data):
 		if not self._decstrat:
