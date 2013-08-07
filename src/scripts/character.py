@@ -254,6 +254,7 @@ class UllurCharacter(Character):
 		self.left_attack_manager = MeleeAttackManager(self, attack_sensors, self.LEFT_MELEE_ATTACKS, 5)
 		#self.right_attack_manager = MeleeAttackManager(self, attack_sensors, self.RIGHT_MELEE_ATTACKS)
 		self.right_attack_manager = MouseRangeAttackManager(self, "Projectile", 1, 100, 10, 0.5)
+		self.collectables = []
 
 	def update(self):
 		self.left_attack_manager.update()
@@ -267,3 +268,7 @@ class UllurCharacter(Character):
 			self.left_attack_manager.attack()
 		else:
 			self.right_attack_manager.attack()
+
+	def add_collectable(self, collectable):
+		if collectable not in self.collectables:
+			self.collectables.append(collectable)

@@ -48,6 +48,16 @@ def init():
 			traceback.print_exc()
 			logic.ai_system = None
 
+		try:
+			from scripts.collectable import CollectableSensor
+			logic.collectables = []
+			for i in [i for i in logic.getCurrentScene().objects if i.name.startswith('Collectable')]:
+				if i.groupObject:
+					logic.collectables.append(CollectableSensor(i))
+		except:
+			import traceback
+			traceback.print_exc()
+
 		logic.mouse.position = (0.5, 0.5)
 
 
@@ -128,4 +138,8 @@ def run():
 		if i.is_dead:
 			logic.meatsacks.remove(i)
 			i.endObject()
+
+	if len(logic.collectables) == len(logic.character.collectables):
+		logic.collectables = []
+		print("All collectibles gathered.")
 
