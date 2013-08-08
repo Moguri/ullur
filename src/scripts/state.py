@@ -99,15 +99,20 @@ class DefaultState:
 
 		cam_vec = cam.getAxisVect((0, 0, -1))
 		cam_vec.z = 0
-		offset = cam_vec.angle(Vector((0, 1, 0)))
-		if cam_vec.x > 0:
-			offset *= -1
-		offset = Euler((0, 0, offset))
-		movevec.rotate(offset)
+
+		if cam_vec.length_squared != 0:
+			offset = cam_vec.angle(Vector((0, 1, 0)))
+			if cam_vec.x > 0:
+				offset *= -1
+			offset = Euler((0, 0, offset))
+			movevec.rotate(offset)
 
 		self.character.move(movevec.xy)
 
-		dt = 1 / logic.getAverageFrameRate()
+		if logic.getAverageFrameRate():
+			dt = 1 / logic.getAverageFrameRate()
+		else:
+			dt = 0
 		if self.ai_system:
 			self.ai_system.update(dt)
 
