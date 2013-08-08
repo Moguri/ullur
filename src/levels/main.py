@@ -58,6 +58,13 @@ def init():
 			import traceback
 			traceback.print_exc()
 
+		try:
+			from scripts.state import StateSystem, DefaultState
+			logic.state_system = StateSystem(DefaultState)
+		except:
+			import traceback
+			traceback.print_exc()
+
 		logic.mouse.position = (0.5, 0.5)
 
 
@@ -69,6 +76,8 @@ def run():
 
 	if not logic.character:
 		return
+
+	logic.state_system.update()
 
 	logic.character.update()
 
