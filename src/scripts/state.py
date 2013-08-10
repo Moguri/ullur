@@ -54,6 +54,7 @@ class DefaultState:
 		cam = logic.getCurrentScene().active_camera
 
 		movevec = Vector((0, 0, 0))
+		self.character.running = False
 
 		for key, status in logic.keyboard.active_events.items():
 			if key == events.WKEY:
@@ -66,6 +67,8 @@ class DefaultState:
 				movevec += Vector((1, 0, 0))
 			elif key == events.SPACEKEY and status == logic.KX_INPUT_JUST_ACTIVATED:
 				self.character.jump()
+			elif key == events.LEFTSHIFTKEY:
+				self.character.running = True
 
 		for event, status in logic.mouse.active_events.items():
 			if event == events.LEFTMOUSE and status == logic.KX_INPUT_JUST_ACTIVATED:

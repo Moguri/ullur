@@ -53,6 +53,8 @@ class Character(types.KX_GameObject):
 
 		self.gravity = self.GRAVITY
 
+		self.running = False
+
 		self = self
 
 	@property
@@ -103,7 +105,7 @@ class Character(types.KX_GameObject):
 		if not "DEAD" in self._flags:
 			self.applyRotation(Vector((0, 0, rotation)))
 
-	def animate(self, animation):
+	def animate(self, animation, speed=1.0):
 		if self.animation_lock:
 			return
 
@@ -117,7 +119,7 @@ class Character(types.KX_GameObject):
 				continue
 			ob = self.armature
 
-			ob.playAction(anim, start, end, play_mode=logic.KX_ACTION_MODE_LOOP, layer=layer, blendin=3, layer_weight=0.5)
+			ob.playAction(anim, start, end, play_mode=logic.KX_ACTION_MODE_LOOP, layer=layer, blendin=3, layer_weight=0.5, speed=speed)
 
 	def stop_animation(self, layer):
 		if self._armature:
@@ -141,7 +143,7 @@ class Character(types.KX_GameObject):
 		elif self._speed_h.length_squared < 0.0001:
 			self.animate('idle')
 		else:
-			self.animate('move')
+			self.animate('move', 2.0 if self.running else 1.0)
 
 	def move(self, direction):
 		'''Moves the player horizontally'''
@@ -165,7 +167,7 @@ class Character(types.KX_GameObject):
 				self._speed_h += self.DECELERATION * direction
 
 			if not self.airborne:
-				max_speed = self.MAX_SPEED
+				max_speed = self.MAX_SPEED * (2.0 if self.running else 1.0)
 			else:
 				max_speed = self.MAX_AIR_SPEED
 
