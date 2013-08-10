@@ -41,7 +41,8 @@ class DefaultState:
 			agent.load_definition("../scripts/ai/definitions/state_test.json")
 			self.ai_system._agents.append(agent)
 
-		self.collectables = mutate_collectables(logic.getCurrentScene().objects)
+		self.collectables = []
+		mutate_collectables(logic.getCurrentScene().objects, self.collectables)
 
 		logic.mouse.position = (0.5, 0.5)
 
@@ -123,8 +124,8 @@ class DefaultState:
 				self.meatsacks.remove(i)
 				i.endObject()
 
-		if len(self.collectables) == len(self.character.collectables):
-			self.collectables = []
+		if self.collectables is not None and len(self.collectables) == 0:
+			self.collectables = None
 			print("All collectables gathered.")
 
 
