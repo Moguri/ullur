@@ -125,6 +125,6 @@ class DefaultState:
 
 		if len(self.collectables) == len(self.character.collectables):
 			self.collectables = []
-			print("All collectibles gathered.")
+			print("All collectables gathered.")
 
 
