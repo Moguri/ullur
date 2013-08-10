@@ -15,3 +15,12 @@ class CollectableSensor(types.KX_GameObject):
 			other.add_collectable(self)
 
 			self.endObject()
+
+
+def mutate_collectables(objects):
+	collectables = []
+	for i in [i for i in objects if i.name.startswith('Collectable')]:
+		if i.groupObject:
+			collectables.append(CollectableSensor(i))
+
+	return collectables

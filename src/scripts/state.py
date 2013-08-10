@@ -17,7 +17,7 @@ from mathutils import Vector, Euler
 from .character import UllurCharacter, Meatsack
 from .ai.manager import Manager
 from .ai.agent_bge import AgentBGE
-from .collectable import CollectableSensor
+from .collectable import mutate_collectables
 
 
 class DefaultState:
@@ -41,10 +41,7 @@ class DefaultState:
 			agent.load_definition("../scripts/ai/definitions/state_test.json")
 			self.ai_system._agents.append(agent)
 
-		self.collectables = []
-		for i in [i for i in logic.getCurrentScene().objects if i.name.startswith('Collectable')]:
-			if i.groupObject:
-				self.collectables.append(CollectableSensor(i))
+		self.collectables = mutate_collectables(logic.getCurrentScene().objects)
 
 		logic.mouse.position = (0.5, 0.5)
 
