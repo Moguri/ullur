@@ -16,6 +16,8 @@ class Character(types.KX_GameObject):
 	DECELERATION = ACCELERATION * 10
 	FRICTION = ACCELERATION
 
+	RUN_MULTIPLIER = 2.0
+
 	GRAVITY = 9.8 * 5
 
 	MESH = "Sinbad"
@@ -143,7 +145,7 @@ class Character(types.KX_GameObject):
 		elif self._speed_h.length_squared < 0.0001:
 			self.animate('idle')
 		else:
-			self.animate('move', 2.0 if self.running else 1.0)
+			self.animate('move', self.RUN_MULTIPLIER if self.running else 1.0)
 
 	def move(self, direction):
 		'''Moves the player horizontally'''
@@ -167,7 +169,7 @@ class Character(types.KX_GameObject):
 				self._speed_h += self.DECELERATION * direction
 
 			if not self.airborne:
-				max_speed = self.MAX_SPEED * (2.0 if self.running else 1.0)
+				max_speed = self.MAX_SPEED * (self.RUN_MULTIPLIER if self.running else 1.0)
 			else:
 				max_speed = self.MAX_AIR_SPEED
 
