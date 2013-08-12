@@ -2,6 +2,3 @@
 ---------------------
 
 .. automodule:: scripts.attack_manager
-    :members:
-    :undoc-members:
-    :show-inheritance:

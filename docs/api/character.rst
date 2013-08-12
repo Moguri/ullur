@@ -2,6 +2,3 @@
 ----------------
 
 .. automodule:: scripts.character
-    :members:
-    :undoc-members:
-    :show-inheritance:

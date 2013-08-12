@@ -247,3 +247,4 @@ texinfo_documents = [
 # -- Options for autodoc ------------------------------------------------------
 
 autoclass_content = "both"
+autodoc_default_flags = ['members', 'undoc-members', 'show-inheritance']
