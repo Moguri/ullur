@@ -4,3 +4,5 @@
    character
    collectable
    state
+
+   ai/modules
