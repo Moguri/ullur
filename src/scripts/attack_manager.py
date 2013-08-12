@@ -10,7 +10,7 @@ class AttackSensor(types.KX_GameObject):
 	def __init__(self, gameobj, character):
 		"""
 		:param gameobj: The KX_GameObject to mutate (passed on to __new__)
-		:param character: The :class:`scripts.character.Character` this sensor is attached too
+		:param character: The :class:`.Character` this sensor is attached too
 
 		"""
 		self._character = character
