@@ -1,8 +1,15 @@
 class StateSystem:
+	"""A system for handling game states"""
+
 	def __init__(self, initial_state):
+		"""
+		:param initial_state: The class of the first state to load
+		"""
 		self.state = initial_state()
 
 	def update(self):
+		"""Update method which should be called every frame to update this system and run its states"""
+
 		next_state = self.state.update()
 		if next_state:
 			if hasattr(self.state, "cleanup"):
@@ -21,10 +28,12 @@ from .collectable import mutate_collectables
 
 
 class DefaultState:
-	CAM_MAX_DIST = 9
-	CAM_MIN_DIST = 7
-	CAM_DOWN_LIMIT = 0.5
-	CAM_UP_LIMIT = -1.1
+	"""Ullur's main state"""
+
+	CAM_MAX_DIST = 9  #: The maximum follow distance for the camera
+	CAM_MIN_DIST = 7  #: The minimum follow distance for the camera
+	CAM_DOWN_LIMIT = 0.5  #: The maximum angle of the camera relative to the horizontal (faces into the ground)
+	CAM_UP_LIMIT = -1.1  #: The minimum angle of the camera relative to the horizontal (faces into the sky)
 
 	def __init__(self):
 		self.character = UllurCharacter.spawn()
@@ -47,6 +56,7 @@ class DefaultState:
 		logic.mouse.position = (0.5, 0.5)
 
 	def update(self):
+		"""Called by the :class:`.StateSystem` to run this state"""
 		self.character.update()
 
 		cam = logic.getCurrentScene().active_camera
