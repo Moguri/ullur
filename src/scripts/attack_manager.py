@@ -229,6 +229,7 @@ class RangeAttackManager:
 
 	def attack(self, start_position, direction):
 		"""Have this manager do an attack
+
 		:param start_position: The starting position of the projectile
 		:param direction: The direction vector of the projectile
 		"""
