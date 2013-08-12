@@ -8,20 +8,26 @@ from .attack_manager import AttackSensor, MeleeAttackManager, MouseRangeAttackMa
 
 
 class Character(types.KX_GameObject):
-	MAX_HP = 10
+	"""	A character wrapper"""
 
-	MAX_SPEED = 0.10
-	MAX_AIR_SPEED = MAX_SPEED * 0.75
-	ACCELERATION = 0.01
-	DECELERATION = ACCELERATION * 10
-	FRICTION = ACCELERATION
+	MAX_HP = 10  #: Maximum HP for the character
 
-	RUN_MULTIPLIER = 2.0
+	MAX_SPEED = 0.10  #: Maximum speed of the character
+	MAX_AIR_SPEED = MAX_SPEED * 0.75  #: Maximum speed while airborne
+	ACCELERATION = 0.01  #: How much to accelerate the character while moving
+	DECELERATION = ACCELERATION * 10  #: How much to deccelerate the character while not moving
+	FRICTION = ACCELERATION  #: Amount of friction applied to the character while moving and stopping
 
-	GRAVITY = 9.8 * 5
+	RUN_MULTIPLIER = 2.0  #: How many times faster the character (and their move animations) are while running
 
-	MESH = "Sinbad"
+	GRAVITY = 9.8 * 5  #: Starting gravity value for the Bullet character controller
 
+	MESH = "Sinbad"  #: The name of the blendfile and object to use for spawning an instance of the character
+
+	#: Mapping of animation names to their actions. The action is a list of:
+	#:     ('name', start_frame, end_frame)
+	#:
+	#: Each item in this list is played in its own layer
 	ANIMATIONS = {
 				"move": [('RunBase', 1, 20), ('RunTop', 1, 20)],
 				"idle": [('IdleBase', 1, 220), ('IdleTop', 1, 300)],
@@ -31,6 +37,12 @@ class Character(types.KX_GameObject):
 				}
 
 	def __init__(self, obj):
+		"""
+		:param obj: The KX_GameObject to mutate
+
+		.. warning::
+		   You should never use this class's constructor, always use the :func:`spawn` method to create a character.
+		"""
 		types.KX_GameObject.__init__(obj)
 
 		self._speed_h = Vector.Fill(2)
@@ -61,10 +73,12 @@ class Character(types.KX_GameObject):
 
 	@property
 	def is_dead(self):
+		"""True if the character is dead"""
 		return "DEAD" in self._flags
 
 	@property
 	def gravity(self):
+		"""The current gravity value used for Bullet's character controller"""
 		return self._phy_char.gravity
 
 	@gravity.setter
@@ -73,14 +87,23 @@ class Character(types.KX_GameObject):
 
 	@property
 	def airborne(self):
+		"""True if the character is in the air"""
 		return not self._phy_char.onGround
 
 	@property
 	def armature(self):
+		"""The object to use for playing animations"""
 		return self._armature if self._armature else self
 
 	@classmethod
 	def spawn(cls, position=None, orientation=None):
+		"""Spawns an instance of the character
+
+		:param position: The world position of the new instance
+		:param orientation: The world orientation of the new instance
+		:rtype: The new character instance
+		"""
+
 		name = cls.MESH
 
 		library = "//../characters/" + name + ".blend"
@@ -100,14 +123,24 @@ class Character(types.KX_GameObject):
 		return char
 
 	def free(self):
+		"""Frees the blendfile used for the character"""
 		if self._library:
 			logic.LibFree(self._library)
 
 	def rotate(self, rotation):
+		"""Rotate the character about its z axis
+
+		:param rotation: Amount of rotation in radians
+		"""
 		if not "DEAD" in self._flags:
 			self.applyRotation(Vector((0, 0, rotation)))
 
 	def animate(self, animation, speed=1.0):
+		"""Animate a character using its :attr:`ANIMATIONS` dictionary
+
+		:param animation: The key for the animation to play
+		:param speed: The playback speed for the animation
+		"""
 		if self.animation_lock:
 			return
 
@@ -124,12 +157,17 @@ class Character(types.KX_GameObject):
 			ob.playAction(anim, start, end, play_mode=logic.KX_ACTION_MODE_LOOP, layer=layer, blendin=3, layer_weight=0.5, speed=speed)
 
 	def stop_animation(self, layer):
+		"""Stop playing animations on a given layer
+
+		:param layer: The layer to stop playing animations on
+		"""
 		if self._armature:
 			self._armature.stopAction(layer)
 		else:
 			self.stopAction(layer)
 
 	def update(self):
+		"""Update method which should be called every frame to update this character"""
 		if self.is_dead:
 			self._apply_movement(Vector((0, 0, 0)))
 			self.animate('dead')
@@ -148,7 +186,10 @@ class Character(types.KX_GameObject):
 			self.animate('move', self.RUN_MULTIPLIER if self.running else 1.0)
 
 	def move(self, direction):
-		'''Moves the player horizontally'''
+		"""Moves the player horizontally
+
+		:param direction: A direction vector for the movement
+		"""
 
 		if self.is_dead:
 			return
@@ -201,7 +242,8 @@ class Character(types.KX_GameObject):
 
 			self.localOrientation = ori
 
-	def jump(self, double=False):
+	def jump(self):
+		"""Makes the character jump"""
 		if self.is_dead:
 			return
 
@@ -211,7 +253,7 @@ class Character(types.KX_GameObject):
 		self._phy_char.jump()
 
 	def _apply_movement(self, vec):
-		'''Applies a movement vector to the in game player object'''
+		"""Applies a movement vector to the in game player object"""
 
 		# Scale the speed so FPS changes don't mess with movement
 		fps = logic.getAverageFrameRate()
@@ -221,7 +263,8 @@ class Character(types.KX_GameObject):
 
 
 class Meatsack(Character):
-	MESH = "Cosbad"
+	"""A character subclass for the Meatsack enemies"""
+	MESH = "Cosbad"  #: See :attr:`Character.MESH`
 
 	MELEE_ATTACK = [
 			('SliceVertical', 1, 16),
@@ -234,15 +277,18 @@ class Meatsack(Character):
 		self.attack_manager = MeleeAttackManager(self, attack_sensors, self.MELEE_ATTACK, 5)
 
 	def update(self):
+		"""See :func:`Character.update`"""
 		self.attack_manager.update()
 		super().update()
 
 	def attack(self):
+		"""Makes the character perform a melee attack"""
 		self.attack_manager.attack()
 
 
 
 class UllurCharacter(Character):
+	"""A character subclass for the player controlled character"""
 	LEFT_MELEE_ATTACKS = [
 			('Attack1', 1, 4),
 			('Attack2', 1, 4),
@@ -261,11 +307,16 @@ class UllurCharacter(Character):
 		self.collectables = []
 
 	def update(self):
+		"""See :func:`Character.update`"""
 		self.left_attack_manager.update()
 		self.right_attack_manager.update()
 		super().update()
 
 	def attack(self, mode):
+		"""Makes the character attack
+
+		:param mode: The attack manager to use, either 'LEFT' or 'RIGHT'
+		"""
 
 		if mode == "LEFT":
 			self.stop_animation(1)
@@ -274,5 +325,9 @@ class UllurCharacter(Character):
 			self.right_attack_manager.attack()
 
 	def add_collectable(self, collectable):
+		"""Adds a :class:`.Collectable` to the character
+
+		:param collectable: The :class:`.Collectable` to add
+		"""
 		if collectable not in self.collectables:
 			self.collectables.append(collectable)
