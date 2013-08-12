@@ -6,10 +6,10 @@
 Welcome to Ullur's documentation!
 =================================
 
-Contents:
+Modules:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    api/modules
 
