@@ -9,7 +9,7 @@ Welcome to Ullur's documentation!
 Modules:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
 
    api/modules
 
