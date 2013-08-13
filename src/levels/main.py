@@ -24,7 +24,8 @@ def init():
 		sys.path.append("..")
 
 		try:
-			from scripts.state import StateSystem, DefaultState
+			from scripts.state import DefaultState
+			from scripts.framework.state import StateSystem
 			logic.state_system = StateSystem(DefaultState)
 		except:
 			import traceback

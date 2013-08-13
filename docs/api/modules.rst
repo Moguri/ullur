@@ -4,5 +4,6 @@
    attack_manager
    character
    collectable
+   framework/modules
    state
 

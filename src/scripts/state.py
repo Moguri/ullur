@@ -12,26 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-class StateSystem:
-	"""A system for handling game states"""
-
-	def __init__(self, initial_state):
-		"""
-		:param initial_state: The class of the first state to load
-		"""
-		self.state = initial_state()
-
-	def update(self):
-		"""Update method which should be called every frame to update this system and run its states"""
-
-		next_state = self.state.update()
-		if next_state:
-			if hasattr(self.state, "cleanup"):
-				self.state.cleanup()
-			self.state = next_state()
-
-
-# Try to keep Ullur specific stuff below this line to make it easier to separate later
 import math
 from bge import logic, events
 from mathutils import Vector, Euler
