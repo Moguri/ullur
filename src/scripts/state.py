@@ -13,6 +13,7 @@
 #   limitations under the License.
 
 import math
+import sys
 from bge import logic, events
 from mathutils import Vector, Euler
 from .character import UllurCharacter, Meatsack
@@ -20,6 +21,26 @@ from .ai.manager import Manager
 from .ai.agent_bge import AgentBGE
 from .collectable import mutate_collectables
 
+
+class StartupState:
+	"""Handles displaying the main menu and launching the level"""
+
+	MAIN_LEVEL = "//test_grounds.blend"
+
+	def update(self):
+		"""Called by the :class:`.StateSystem` to run this state"""
+
+		logic.LibLoad(self.MAIN_LEVEL, 'Scene')
+
+		# Remove any non-startup mains, but move the adder
+		ob = logic.getCurrentController().owner
+		for i in [i for i in logic.getCurrentScene().objects if i.name.startswith("main")]:
+			if i != ob:
+				ob.worldPosition = i.worldPosition
+				i.endObject()
+
+
+		return DefaultState
 
 class DefaultState:
 	"""Ullur's main state"""

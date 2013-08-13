@@ -27,6 +27,10 @@ DEFAULTS = {
 		'show_fps': 'false',
 		'show_profiler': 'false',
 	},
+
+	'game': {
+		'dostartup': 'true',
+	},
 }
 
 def main():
@@ -63,7 +67,12 @@ def main():
 	if config.getboolean('system', 'debug'):
 		args.append("-c")
 
-	args.append(os.getcwd() + "/src/levels/test_grounds.blend")
+	args.append(os.getcwd() + "/src/levels/startup.blend")
+
+	# All args after '-' are sent to Python
+	args.append('-')
+	if config.get('game', 'dostartup'):
+		args.append('dostartup')
 
 	# Keep PyDev from setting the PYTHONPATH
 	env = os.environ.copy()

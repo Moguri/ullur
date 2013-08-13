@@ -24,9 +24,13 @@ def init():
 		sys.path.append("..")
 
 		try:
-			from scripts.state import DefaultState
+			from scripts.state import StartupState, DefaultState
 			from scripts.framework.state import StateSystem
-			logic.state_system = StateSystem(DefaultState)
+			if ('dostartup' in sys.argv):
+				logic.state_system = StateSystem(StartupState)
+			else:
+				print("Skipping startup")
+				logic.state_system = StateSystem(DefaultState)
 		except:
 			import traceback
 			traceback.print_exc()
