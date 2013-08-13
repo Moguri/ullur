@@ -10,30 +10,43 @@ import sys
 from collections import OrderedDict
 
 CONFIG_NAME = "config.ini"
+DEFAULTS = {
+	'system': {
+		'debug': 'false',
+		'player_path': 'blenderplayer',
+	},
 
+	'window': {
+		'fullscreen': 'false',
+		'x_resolution': '1600',
+		'y_resolution': '900',
+		'aasamples': '4',
+	},
+
+	'profile': {
+		'show_fps': 'false',
+		'show_profiler': 'false',
+	},
+}
 
 def main():
 	config = configparser.ConfigParser()
 
 	if CONFIG_NAME in os.listdir('.'):
 		config.read(CONFIG_NAME)
-	else:
-		config.add_section('system')
-		config.set('system', 'debug', 'false')
-		config.set('system', 'player_path', 'blenderplayer')
 
-		config.add_section('window')
-		config.set('window', 'fullscreen', 'false')
-		config.set('window', 'x_resolution', '1600')
-		config.set('window', 'y_resolution', '900')
-		config.set('window', 'aasamples', '4')
+	needs_write = False
 
-		config.add_section('profile')
-		config.set('profile', 'show_fps', 'false')
-		config.set('profile', 'show_profiler', 'false')
+	# Make the config safe
+	for section, options in DEFAULTS.items():
+		if not config.has_section(section):
+			config.add_section(section)
+			needs_write = True
 
-		with open(CONFIG_NAME, 'w') as f:
-			config.write(f)
+		for option, value in options.items():
+			if not config.has_option(section, option):
+				needs_write = True
+				config.set(section, option, value)
 
 	args = [config.get('system', 'player_path')]
 
@@ -56,9 +69,12 @@ def main():
 	env = os.environ.copy()
 	if 'PYTHONPATH' in env:
 		del env['PYTHONPATH']
-	#env['PYTHONHOME'] = "/home/mitchell/blender-dev/trunk/build/bin/2.66/python"
 
 	subprocess.call(args, env=env)
+
+	if needs_write:
+		with open(CONFIG_NAME, 'w') as f:
+			config.write(f)
 
 
 if __name__ == '__main__':
