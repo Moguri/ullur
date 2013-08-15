@@ -165,7 +165,7 @@ class Character(types.KX_GameObject):
 				continue
 			ob = self.armature
 
-			ob.playAction(anim, start, end, play_mode=logic.KX_ACTION_MODE_LOOP, layer=layer, blendin=3, layer_weight=0.5, speed=speed)
+			ob.playAction(anim, start, end, play_mode=logic.KX_ACTION_MODE_LOOP, layer=layer, blendin=3, layer_weight=1.0, speed=speed, blend_mode=logic.KX_ACTION_BLEND_ADD)
 
 	def stop_animation(self, layer):
 		"""Stop playing animations on a given layer
