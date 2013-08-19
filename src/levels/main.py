@@ -20,8 +20,8 @@ from bge import logic
 
 def init():
 	if ".." not in sys.path:
-		os.chdir(logic.expandPath("//"))
-		sys.path.append("..")
+		os.chdir(logic.expandPath("//../"))
+		sys.path.append(".")
 
 		try:
 			from scripts.state import StartupState, DefaultState
