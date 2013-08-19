@@ -20,6 +20,7 @@ import configparser
 __DEFAULT_CONFIG = {
 	'paths': {
 		'characters': 'characters',
+		'levels': 'levels',
 	},
 }
 

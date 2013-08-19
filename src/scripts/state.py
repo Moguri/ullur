@@ -20,12 +20,14 @@ from .character import UllurCharacter, Meatsack
 from .ai.manager import Manager
 from .ai.agent_bge import AgentBGE
 from .collectable import mutate_collectables
+from .framework import utils
 
 
 class StartupState:
 	"""Handles displaying the main menu and launching the level"""
 
-	MAIN_LEVEL = "//test_grounds.blend"
+	#  The "//../" is to get LibLoad to be happy, we should find a better fix at some point
+	MAIN_LEVEL = "//../"+utils.get_path('levels', 'test_grounds.blend')
 
 	def update(self):
 		"""Called by the :class:`.StateSystem` to run this state"""
@@ -62,7 +64,7 @@ class DefaultState:
 		for meatsack in self.meatsacks:
 			agent = AgentBGE(meatsack)
 			agent.target = target
-			agent.load_definition("../scripts/ai/definitions/state_test.json")
+			agent.load_definition("scripts/ai/definitions/state_test.json")
 			self.ai_system._agents.append(agent)
 
 		self.collectables = []
