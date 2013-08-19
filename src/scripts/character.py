@@ -51,6 +51,7 @@ class Meatsack(Character):
 
 class UllurCharacter(Character):
 	"""A character subclass for the player controlled character"""
+	MESH = "Sinbad"  #: See :attr:`Character.MESH`
 
 	ANIMATIONS = {
 				"move": [{'name':'RunBase', 'start_frame':1, 'end_frame':20}, {'name':'RunTop', 'start_frame':1, 'end_frame':20}],

@@ -35,7 +35,7 @@ class Character(types.KX_GameObject):
 
 	GRAVITY = 9.8 * 5  #: Starting gravity value for the Bullet character controller
 
-	MESH = "Sinbad"  #: The name of the blendfile and object to use for spawning an instance of the character
+	MESH = ""  #: The name of the blendfile and object to use for spawning an instance of the character
 
 	#: Mapping of animation names to their actions. Each item is a dictionary of keyword arguments to KX_GameObject.playAction(), and each item is played in its own layer.
 	#:
@@ -138,6 +138,9 @@ class Character(types.KX_GameObject):
 		:param orientation: The world orientation of the new instance
 		:rtype: The new character instance
 		"""
+
+		if not cls.MESH:
+			raise AttributeError(cls.__name__ + " does not define a usable MESH attribute.")
 
 		name = cls.MESH
 
