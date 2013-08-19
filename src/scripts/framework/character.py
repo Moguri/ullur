@@ -16,6 +16,7 @@
 import math
 from bge import logic, constraints, types
 from mathutils import Vector
+from .animations import AnimationManager, AnimationState
 
 
 class Character(types.KX_GameObject):
@@ -35,17 +36,33 @@ class Character(types.KX_GameObject):
 
 	MESH = "Sinbad"  #: The name of the blendfile and object to use for spawning an instance of the character
 
-	#: Mapping of animation names to their actions. The action is a list of:
-	#:     ('name', start_frame, end_frame)
-	#:
-	#: Each item in this list is played in its own layer
+	#: Mapping of animation names to their actions. Each item is a dictionary of keyword arguments to KX_GameObject.playAction(), and each item is played in its own layer
 	ANIMATIONS = {
-				"move": [('RunBase', 1, 20), ('RunTop', 1, 20)],
-				"idle": [('IdleBase', 1, 220), ('IdleTop', 1, 300)],
-				"jump_start": [('JumpStart', 1, 5)],
-				"jump_loop": [('JumpLoop', 1, 30)],
-				"dead": [('Dance', 1, 71)],
+				"move": [{'name':'RunBase', 'start_frame':1, 'end_frame':20}, {'name':'RunTop', 'start_frame':1, 'end_frame':20}],
+				"idle": [{'name':'IdleBase', 'start_frame':1, 'end_frame':220}, {'name':'IdleTop', 'start_frame':1, 'end_frame':300}],
+				"jump_start": [{'name':'JumpStart', 'start_frame':1, 'end_frame':5}],
+				"jump_loop": [{'name':'JumpLoop', 'start_frame':1, 'end_frame':30}],
+				"dead": [{'name':'Dance', 'start_frame':1, 'end_frame':71}],
 				}
+
+	class IdleAnimState(AnimationState):
+		def update(self):
+			return self.character.ANIMATIONS['idle']
+
+	class MoveAnimState(AnimationState):
+		def update(self):
+			anim = self.character.ANIMATIONS['move']
+			for i in anim:
+				i['speed'] = self.character.RUN_MULTIPLIER if self.character.running else 1.0
+			return anim
+
+	class JumpAnimState(AnimationState):
+		def update(self):
+			return self.character.ANIMATIONS['jump_loop']
+
+	class DeadAnimState(AnimationState):
+		def update(self):
+			return self.character.ANIMATIONS['dead']
 
 	def __init__(self, obj):
 		"""
@@ -80,7 +97,7 @@ class Character(types.KX_GameObject):
 
 		self.running = False
 
-		self = self
+		self.animation_manager = AnimationManager(self, self.IdleAnimState)
 
 	@property
 	def is_dead(self):
@@ -146,55 +163,20 @@ class Character(types.KX_GameObject):
 		if not "DEAD" in self._flags:
 			self.applyRotation(Vector((0, 0, rotation)))
 
-	def animate(self, animation, speed=1.0):
-		"""Animate a character using its :attr:`ANIMATIONS` dictionary
-
-		:param animation: The key for the animation to play
-		:param speed: The playback speed for the animation
-		"""
-		if self.animation_lock:
-			return
-
-		if animation not in self.ANIMATIONS:
-			print("WARNING: %s does not have animation %s" % (self.__class__.__name__, animation))
-			return
-
-		for layer, v in enumerate(self.ANIMATIONS[animation]):
-			anim, start, end = v
-			if anim == "*":
-				continue
-			ob = self.armature
-
-			ob.playAction(anim, start, end, play_mode=logic.KX_ACTION_MODE_LOOP, layer=layer, blendin=3, layer_weight=1.0, speed=speed, blend_mode=logic.KX_ACTION_BLEND_ADD)
-
-	def stop_animation(self, layer):
-		"""Stop playing animations on a given layer
-
-		:param layer: The layer to stop playing animations on
-		"""
-		if self._armature:
-			self._armature.stopAction(layer)
-		else:
-			self.stopAction(layer)
-
 	def update(self):
 		"""Update method which should be called every frame to update this character"""
-		if self.is_dead:
-			self._apply_movement(Vector((0, 0, 0)))
-			self.animate('dead')
-			return
-
 		if self.hp <= 0:
 			self._flags.add("DEAD")
+			self._apply_movement(Vector((0, 0, 0)))
+			self.animation_manager.change_state(self.DeadAnimState)
+
+		if self.is_dead:
 			return
 
-		if self.airborne:
-			self.animate('jump_loop')
-			self.stop_animation(1)
-		elif self._speed_h.length_squared < 0.0001:
-			self.animate('idle')
-		else:
-			self.animate('move', self.RUN_MULTIPLIER if self.running else 1.0)
+		if not self.airborne and self._speed_h.length_squared < 0.0001:
+			self.animation_manager.change_state(self.IdleAnimState)
+
+		self.animation_manager.update()
 
 	def move(self, direction):
 		"""Moves the player horizontally
@@ -235,8 +217,8 @@ class Character(types.KX_GameObject):
 		movement = self._speed_h.to_3d()
 		self._apply_movement(movement)
 
-		# Face the player in the direction they are moving
 		if movement.length_squared > 0.0001:
+			# Face the player in the direction they are moving
 			x = movement.cross(Vector((0, 0, 1)))
 			x.normalize()
 
@@ -253,13 +235,16 @@ class Character(types.KX_GameObject):
 
 			self.localOrientation = ori
 
+			# Handle animations
+			if not self.airborne:
+				self.animation_manager.change_state(self.MoveAnimState)
+
 	def jump(self):
 		"""Makes the character jump"""
 		if self.is_dead:
 			return
 
-		if not self.airborne and self._phy_char.jumpCount == 0:
-			self.animate('jump_start')
+		self.animation_manager.change_state(self.JumpAnimState)
 
 		self._phy_char.jump()
 
