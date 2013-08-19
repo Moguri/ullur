@@ -21,6 +21,13 @@ class Meatsack(Character):
 	"""A character subclass for the Meatsack enemies"""
 	MESH = "Cosbad"  #: See :attr:`Character.MESH`
 
+	ANIMATIONS = {
+				"move": [{'name':'RunBase', 'start_frame':1, 'end_frame':20}, {'name':'RunTop', 'start_frame':1, 'end_frame':20}],
+				"idle": [{'name':'IdleBase', 'start_frame':1, 'end_frame':220}, {'name':'IdleTop', 'start_frame':1, 'end_frame':300}],
+				"jump": [{'name':'JumpLoop', 'start_frame':1, 'end_frame':30}],
+				"dead": [{'name':'Dance', 'start_frame':1, 'end_frame':71}],
+				}
+
 	MELEE_ATTACK = [
 			('SliceVertical', 1, 16),
 		]
@@ -44,6 +51,14 @@ class Meatsack(Character):
 
 class UllurCharacter(Character):
 	"""A character subclass for the player controlled character"""
+
+	ANIMATIONS = {
+				"move": [{'name':'RunBase', 'start_frame':1, 'end_frame':20}, {'name':'RunTop', 'start_frame':1, 'end_frame':20}],
+				"idle": [{'name':'IdleBase', 'start_frame':1, 'end_frame':220}, {'name':'IdleTop', 'start_frame':1, 'end_frame':300}],
+				"jump": [{'name':'JumpLoop', 'start_frame':1, 'end_frame':30}],
+				"dead": [{'name':'Dance', 'start_frame':1, 'end_frame':71}],
+				}
+
 	LEFT_MELEE_ATTACKS = [
 			('Attack1', 1, 4),
 			('Attack2', 1, 4),

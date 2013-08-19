@@ -37,33 +37,39 @@ class Character(types.KX_GameObject):
 
 	MESH = "Sinbad"  #: The name of the blendfile and object to use for spawning an instance of the character
 
-	#: Mapping of animation names to their actions. Each item is a dictionary of keyword arguments to KX_GameObject.playAction(), and each item is played in its own layer
-	ANIMATIONS = {
-				"move": [{'name':'RunBase', 'start_frame':1, 'end_frame':20}, {'name':'RunTop', 'start_frame':1, 'end_frame':20}],
-				"idle": [{'name':'IdleBase', 'start_frame':1, 'end_frame':220}, {'name':'IdleTop', 'start_frame':1, 'end_frame':300}],
-				"jump_start": [{'name':'JumpStart', 'start_frame':1, 'end_frame':5}],
-				"jump_loop": [{'name':'JumpLoop', 'start_frame':1, 'end_frame':30}],
-				"dead": [{'name':'Dance', 'start_frame':1, 'end_frame':71}],
-				}
+	#: Mapping of animation names to their actions. Each item is a dictionary of keyword arguments to KX_GameObject.playAction(), and each item is played in its own layer.
+	#:
+	#: The following animation names are currently recognized by the default Character class:
+	#:
+	#:     idle
+	#:         Idle Animation (the character isn't moving or airborne)
+	#:     move
+	#:         The character is moving on the ground (i.e., not airborne)
+	#:     jump
+	#:         The character is airborne
+	#:     dead
+	#:         The character is dead
+	ANIMATIONS = {}
 
 	class IdleAnimState(AnimationState):
 		def update(self):
-			return self.character.ANIMATIONS['idle']
+			return self.character.ANIMATIONS.get('idle')
 
 	class MoveAnimState(AnimationState):
 		def update(self):
-			anim = self.character.ANIMATIONS['move']
-			for i in anim:
-				i['speed'] = self.character.RUN_MULTIPLIER if self.character.running else 1.0
+			anim = self.character.ANIMATIONS.get('move')
+			if anim:
+				for i in anim:
+					i['speed'] = self.character.RUN_MULTIPLIER if self.character.running else 1.0
 			return anim
 
 	class JumpAnimState(AnimationState):
 		def update(self):
-			return self.character.ANIMATIONS['jump_loop']
+			return self.character.ANIMATIONS.get('jump')
 
 	class DeadAnimState(AnimationState):
 		def update(self):
-			return self.character.ANIMATIONS['dead']
+			return self.character.ANIMATIONS.get('dead')
 
 	def __init__(self, obj):
 		"""
