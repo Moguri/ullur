@@ -14,7 +14,13 @@
 
 
 import os
-import configparser
+
+try:
+	import configparser
+except ImportError:
+	# This code doesn't actually work on py2, but we do this to make
+	# readthedocs.org happy...
+	import ConfigParser as configparser
 
 
 __DEFAULT_CONFIG = {
