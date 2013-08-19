@@ -21,6 +21,8 @@ class Meatsack(Character):
 	"""A character subclass for the Meatsack enemies"""
 	MESH = "Cosbad"  #: See :attr:`Character.MESH`
 
+
+	#: See :attr:`.Character.ANIMATIONS`
 	ANIMATIONS = {
 				"move": [{'name':'RunBase', 'start_frame':1, 'end_frame':20}, {'name':'RunTop', 'start_frame':1, 'end_frame':20}],
 				"idle": [{'name':'IdleBase', 'start_frame':1, 'end_frame':220}, {'name':'IdleTop', 'start_frame':1, 'end_frame':300}],
@@ -39,7 +41,7 @@ class Meatsack(Character):
 		self.attack_manager = MeleeAttackManager(self, attack_sensors, self.MELEE_ATTACK, 5)
 
 	def update(self):
-		"""See :func:`Character.update`"""
+		"""See :func:`.Character.update`"""
 		self.attack_manager.update()
 		super().update()
 
@@ -53,6 +55,7 @@ class UllurCharacter(Character):
 	"""A character subclass for the player controlled character"""
 	MESH = "Sinbad"  #: See :attr:`Character.MESH`
 
+	#: See :attr:`.Character.ANIMATIONS`
 	ANIMATIONS = {
 				"move": [{'name':'RunBase', 'start_frame':1, 'end_frame':20}, {'name':'RunTop', 'start_frame':1, 'end_frame':20}],
 				"idle": [{'name':'IdleBase', 'start_frame':1, 'end_frame':220}, {'name':'IdleTop', 'start_frame':1, 'end_frame':300}],
