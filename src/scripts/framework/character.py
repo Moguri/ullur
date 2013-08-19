@@ -17,6 +17,7 @@ import math
 from bge import logic, constraints, types
 from mathutils import Vector
 from .animations import AnimationManager, AnimationState
+from . import utils
 
 
 class Character(types.KX_GameObject):
@@ -134,7 +135,7 @@ class Character(types.KX_GameObject):
 
 		name = cls.MESH
 
-		library = "//../characters/" + name + ".blend"
+		library = utils.get_path('characters', name+'.blend')
 		logic.LibLoad(library, "Scene", load_actions=True)
 
 		scene = logic.getCurrentScene()
