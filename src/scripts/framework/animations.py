@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 
-from bge.logic import KX_ACTION_MODE_LOOP, KX_ACTION_BLEND_ADD
+from bge import logic
 
 
 class AnimationManager:
@@ -23,8 +23,8 @@ class AnimationManager:
 	DEFAULTS = {
 		'priority': 0,
 		'blendin': 3,
-		'play_mode': KX_ACTION_MODE_LOOP,
-		'blend_mode': KX_ACTION_BLEND_ADD,
+		'play_mode': logic.KX_ACTION_MODE_LOOP,
+		'blend_mode': logic.KX_ACTION_BLEND_ADD,
 		'layer_weight': 1,
 		'speed': 1,
 	}
