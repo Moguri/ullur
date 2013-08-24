@@ -50,6 +50,19 @@ class Meatsack(Character):
 		self.attack_manager.attack()
 
 
+class Ghost(Character):
+	MESH = "Ghost"
+
+def spawn_baddies(objects, baddies_list):
+	"""Spawns enemies at spawn objects
+
+	:param objects: The list of spawn objects
+	:param baddies_list: The list to store the spawned enemies
+	"""
+	for i in [i for i in objects if "spawn" in i.name.lower()]:
+		cls = i.name.lower().replace("spawn", "").title()
+		baddies_list.append(globals()[cls].spawn(i.worldPosition, i.worldOrientation))
+
 
 class UllurCharacter(Character):
 	"""A character subclass for the player controlled character"""

@@ -16,7 +16,7 @@ import math
 import sys
 from bge import logic, events
 from mathutils import Vector, Euler
-from .character import UllurCharacter, Meatsack
+from .character import UllurCharacter, spawn_baddies
 from .ai.manager import Manager
 from .ai.agent_bge import AgentBGE
 from .collectable import mutate_collectables
@@ -54,10 +54,11 @@ class DefaultState:
 
 	def __init__(self):
 		self.character = UllurCharacter.spawn()
+		
+		object_list = logic.getCurrentScene().objects
 
 		self.meatsacks = []
-		for i in [i for i in logic.getCurrentScene().objects if i.name.startswith('MeatsackSpawn')]:
-			self.meatsacks.append(Meatsack.spawn(i.worldPosition, i.worldOrientation))
+		spawn_baddies(object_list, self.meatsacks)
 
 		self.ai_system = Manager()
 		target = AgentBGE(self.character)
@@ -68,7 +69,7 @@ class DefaultState:
 			self.ai_system._agents.append(agent)
 
 		self.collectables = []
-		mutate_collectables(logic.getCurrentScene().objects, self.collectables)
+		mutate_collectables(object_list, self.collectables)
 
 		logic.mouse.position = (0.5, 0.5)
 
