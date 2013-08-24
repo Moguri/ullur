@@ -30,6 +30,7 @@ DEFAULTS = {
 
 	'game': {
 		'dostartup': 'true',
+		'level': 'startup',
 	},
 }
 
@@ -67,11 +68,11 @@ def main():
 	if config.getboolean('system', 'debug'):
 		args.append("-c")
 
-	args.append(os.getcwd() + "/src/levels/startup.blend")
+	args.append(os.getcwd() + "/src/levels/%s.blend" % config.get('game', 'level'))
 
 	# All args after '-' are sent to Python
-	args.append('-')
-	if config.get('game', 'dostartup'):
+	if config.getboolean('game', 'dostartup'):
+		args.append('-')
 		args.append('dostartup')
 
 	# Keep PyDev from setting the PYTHONPATH
