@@ -53,6 +53,11 @@ class Meatsack(Character):
 class Ghost(Character):
 	MESH = "Ghost"
 
+
+class Wolf(Character):
+	MESH = "Wolf"
+
+
 def spawn_baddies(objects, baddies_list):
 	"""Spawns enemies at spawn objects
 
