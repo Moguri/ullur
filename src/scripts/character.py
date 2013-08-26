@@ -115,7 +115,6 @@ class UllurCharacter(Character):
 		"""
 
 		if mode == "LEFT":
-			self.stop_animation(1)
 			self.left_attack_manager.attack()
 		else:
 			self.right_attack_manager.attack()

@@ -17,6 +17,7 @@ import time
 
 from bge import types, logic
 from mathutils import Vector
+from .framework.animations import AnimationState
 
 class AttackSensor(types.KX_GameObject):
 	"""Sensor object that detects collisions for  :class:`.MeleeAttackManager`"""
@@ -73,6 +74,14 @@ class AttackSensor(types.KX_GameObject):
 class MeleeAttackManager:
 	"""Handles melee attacks for :class:`.Character` objects"""
 
+	class MeleeAttackAnimatonState(AnimationState):
+		def update(self):
+			self.anim['play_mode'] = logic.KX_ACTION_MODE_PLAY
+			self.anim['blend_mode'] = logic.KX_ACTION_BLEND_BLEND
+			self.anim['layer_weight'] = 0
+			self.anim['blendin'] = 0
+			return [self.anim]
+
 	def __init__(self, character, attack_sensors, attacks, damage):
 		"""
 		:param character: The :class:`.Character` this manager is attached to
@@ -91,6 +100,8 @@ class MeleeAttackManager:
 
 		self.attacks = attacks
 		self.max_combo = len(attacks)
+
+		self.anim_state = None
 
 	@property
 	def _attack_time(self):
@@ -121,8 +132,12 @@ class MeleeAttackManager:
 		for i in self._attack_sensors:
 			i.start_attack(self.damage)
 
-		self._obj.animation_lock = self._attacking = True
-		self._obj.armature.playAction(anim, start, end, blendin=2)
+		self._attacking = True
+
+		self.anim_state = self._obj.animation_manager.change_state(self.MeleeAttackAnimatonState)
+		self.anim_state.anim = {'name': anim, 'start_frame':start, 'end_frame': end}
+		self.anim_state.lock_state = True
+
 		self._attack_time = time.time() + (end - start) / 30
 
 		self.combo = (self.combo + 1) % self.max_combo
@@ -132,7 +147,8 @@ class MeleeAttackManager:
 			for i in self._attack_sensors:
 				i.end_attack()
 
-			self._attacking = self._obj.animation_lock = False
+			self._attacking = False
+			self.anim_state.lock_state = False
 
 
 

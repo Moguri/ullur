@@ -54,7 +54,10 @@ class AnimationManager:
 			obj.stopAction(i)
 
 	def change_state(self, state):
-		self.current_state = state(self.character)
+		if not self.current_state.lock_state:
+			self.current_state = state(self.character)
+
+		return self.current_state
 
 
 class AnimationState:
@@ -62,6 +65,7 @@ class AnimationState:
 
 	def __init__(self, character):
 		self.character = character
+		self.lock_state = False
 
 	def update(self):
 		return []
