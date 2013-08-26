@@ -107,14 +107,14 @@ class DefaultState:
 
 		if cam.parent:
 			# X Movement
-			if math.fabs(dx) > 0.01:
+			if math.fabs(dx) > 0.0001:
 				cam.parent.applyRotation((0, 0, dx))
 
 			# Y Movement
 			cam_angle = cam.parent.localOrientation.to_euler('XYZ')
 			move_down_limit = dy > 0 and cam_angle.x < self.CAM_DOWN_LIMIT
 			move_up_limit = dy < 0 and cam_angle.x > self.CAM_UP_LIMIT
-			if math.fabs(dy) > 0.01 and (move_down_limit or move_up_limit):
+			if math.fabs(dy) > 0.0001 and (move_down_limit or move_up_limit):
 				cam.parent.applyRotation((dy/2, 0, 0), True)
 
 			# Zoom in camera based on y movement
