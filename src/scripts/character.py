@@ -58,6 +58,10 @@ class Wolf(Character):
 	MESH = "Wolf"
 
 
+class Werewolf(Character):
+	MESH = "Werewolf"
+
+
 def spawn_baddies(objects, baddies_list):
 	"""Spawns enemies at spawn objects
 
