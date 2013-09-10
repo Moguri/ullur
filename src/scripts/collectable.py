@@ -47,6 +47,7 @@ class CollectableSensor(types.KX_GameObject):
 		else:
 			self.collectable = Collectable
 
+
 	def __new__(cls, gameobj, *args):
 		return super().__new__(cls, gameobj)
 

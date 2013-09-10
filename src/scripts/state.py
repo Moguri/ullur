@@ -146,11 +146,20 @@ class DefaultState:
 			self.ai_system.update(dt)
 
 		# Update meatsacks
+		drops = []
 		for i in self.meatsacks[:]:
 			i.update()
 			if i.is_dead:
 				self.meatsacks.remove(i)
+				drop = i.handle_drop()
+				if drop:
+					drops.append(drop.groupMembers[0])
 				i.endObject()
+
+		# Mutate any drops (we're only dropping collectables at the time being)
+		if drops:
+			mutate_collectables(drops, self.collectables)
+
 
 		if self.collectables is not None and len(self.collectables) == 0:
 			self.collectables = None

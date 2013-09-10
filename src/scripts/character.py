@@ -16,8 +16,20 @@
 from .framework.character import Character
 from .attack_manager import AttackSensor, MeleeAttackManager, MouseRangeAttackManager
 
+from bge import logic
 
-class Meatsack(Character):
+
+class Enemy(Character):
+	"""A character sublcass to handle generic enemy logic."""
+	DROP = None  #: The name of the item to drop (note, this must be in an inactive layer)
+
+	def handle_drop(self):
+		"""Spawn an instance of :attr:`Enemy.DROP` if it is set"""
+		if self.DROP:
+			return logic.getCurrentScene().addObject(self.DROP, self)
+
+
+class Meatsack(Enemy):
 	"""A character subclass for the Meatsack enemies"""
 	MESH = "Cosbad"  #: See :attr:`Character.MESH`
 
@@ -50,16 +62,17 @@ class Meatsack(Character):
 		self.attack_manager.attack()
 
 
-class Ghost(Character):
+class Ghost(Enemy):
 	MESH = "Ghost"
 
 
-class Wolf(Character):
+class Wolf(Enemy):
 	MESH = "Wolf"
 
 
-class Werewolf(Character):
+class Werewolf(Enemy):
 	MESH = "Werewolf"
+	DROP = "CollectableDrop"
 
 
 def spawn_baddies(objects, baddies_list):
