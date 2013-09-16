@@ -29,8 +29,8 @@ DEFAULTS = {
 	},
 
 	'game': {
-		'dostartup': 'true',
-		'level': 'startup',
+		'dostartup': 'false',
+		'level': 'large_island',
 	},
 }
 

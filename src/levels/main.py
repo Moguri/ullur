@@ -26,7 +26,7 @@ def init():
 		try:
 			from scripts.state import StartupState, DefaultState
 			from scripts.framework.state import StateSystem
-			if ('dostartup' in sys.argv):
+			if hasattr(sys, 'argv') and 'dostartup' in sys.argv:
 				logic.state_system = StateSystem(StartupState)
 			else:
 				print("Skipping startup")

@@ -27,22 +27,26 @@ class StartupState:
 	"""Handles displaying the main menu and launching the level"""
 
 	#  The "//../" is to get LibLoad to be happy, we should find a better fix at some point
-	MAIN_LEVEL = "//../"+utils.get_path('levels', 'test_grounds.blend')
+	MAIN_LEVEL = "//../"+utils.get_path('levels', 'large_island.blend')
 
 	def update(self):
 		"""Called by the :class:`.StateSystem` to run this state"""
 
-		logic.LibLoad(self.MAIN_LEVEL, 'Scene')
+		# There seems to be some issues with using LibLoad on the level, so we'll
+		# just use logic.startGame() for now.
+		logic.startGame(logic.expandPath(self.MAIN_LEVEL))
+
+		#logic.LibLoad(self.MAIN_LEVEL, 'Scene')
 
 		# Remove any non-startup mains, but move the adder
-		ob = logic.getCurrentController().owner
-		for i in [i for i in logic.getCurrentScene().objects if i.name.startswith("main")]:
-			if i != ob:
-				ob.worldPosition = i.worldPosition
-				i.endObject()
+		#ob = logic.getCurrentController().owner
+		#for i in [i for i in logic.getCurrentScene().objects if i.name.startswith("main")]:
+			#if i != ob:
+				#ob.worldPosition = i.worldPosition
+				#i.endObject()
 
 
-		return DefaultState
+		#return DefaultState
 
 class DefaultState:
 	"""Ullur's main state"""
