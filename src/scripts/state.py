@@ -14,13 +14,14 @@
 
 import math
 import sys
-from bge import logic, events
+from bge import logic, events, render
 from mathutils import Vector, Euler
 from .character import UllurCharacter, spawn_baddies
 from .ai.manager import Manager
 from .ai.agent_bge import AgentBGE
 from .collectable import mutate_collectables
 from .framework import utils
+from .ui import StartupLayout
 
 
 class StartupState:
@@ -29,24 +30,36 @@ class StartupState:
 	#  The "//../" is to get LibLoad to be happy, we should find a better fix at some point
 	MAIN_LEVEL = "//../"+utils.get_path('levels', 'large_island.blend')
 
+	def __init__(self):
+		logic.ui_system.load_layout(StartupLayout)
+
 	def update(self):
 		"""Called by the :class:`.StateSystem` to run this state"""
 
+		ui = logic.ui_system.layout
+
 		# There seems to be some issues with using LibLoad on the level, so we'll
 		# just use logic.startGame() for now.
-		logic.startGame(logic.expandPath(self.MAIN_LEVEL))
+		for key, status in logic.keyboard.active_events.items():
+			if key == events.ENTERKEY:
+				if ui.menu.selected == "New Game":
+					logic.startGame(logic.expandPath(self.MAIN_LEVEL))
 
-		#logic.LibLoad(self.MAIN_LEVEL, 'Scene')
+				#logic.LibLoad(self.MAIN_LEVEL, 'Scene')
 
-		# Remove any non-startup mains, but move the adder
-		#ob = logic.getCurrentController().owner
-		#for i in [i for i in logic.getCurrentScene().objects if i.name.startswith("main")]:
-			#if i != ob:
-				#ob.worldPosition = i.worldPosition
-				#i.endObject()
+				# Remove any non-startup mains, but move the adder
+				#ob = logic.getCurrentController().owner
+				#for i in [i for i in logic.getCurrentScene().objects if i.name.startswith("main")]:
+					#if i != ob:
+						#ob.worldPosition = i.worldPosition
+						#i.endObject()
 
 
-		#return DefaultState
+				#return DefaultState
+			elif key == events.DOWNARROWKEY and status == logic.KX_INPUT_JUST_ACTIVATED:
+				ui.menu_down()
+			elif key == events.UPARROWKEY and status == logic.KX_INPUT_JUST_ACTIVATED:
+				ui.menu_up()
 
 class DefaultState:
 	"""Ullur's main state"""

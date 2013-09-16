@@ -26,6 +26,10 @@ def init():
 		try:
 			from scripts.state import StartupState, DefaultState
 			from scripts.framework.state import StateSystem
+			from scripts import bgui
+
+			logic.ui_system = bgui.bge_utils.System()
+
 			if hasattr(sys, 'argv') and 'dostartup' in sys.argv:
 				logic.state_system = StateSystem(StartupState)
 			else:
